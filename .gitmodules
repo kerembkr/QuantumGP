@@ -1,0 +1,3 @@
+[submodule "BoostedGPR"]
+	path = BoostedGPR
+	url = https://github.com/kerembkr/BoostedGPR.git
