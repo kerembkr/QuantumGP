@@ -1,3 +1,6 @@
 [submodule "BoostedGPR"]
 	path = BoostedGPR
 	url = https://github.com/kerembkr/BoostedGPR.git
+[submodule "NoPlateauVQLS"]
+	path = NoPlateauVQLS
+	url = https://github.com/kerembkr/NoPlateauVQLS.git
