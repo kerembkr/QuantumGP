@@ -1,25 +1,31 @@
 import numpy as np
 
 
-def f1(x):
+def oscillatory_increasing_amplitude(x):
+    # Function 1: Oscillatory function with increasing amplitude
     return x * np.sin(x)
 
 
-def f2(x):
-    return np.sin(4*x) + 1.0
+def high_frequency_sine(x):
+    # Function 2: High frequency sine wave
+    return np.sin(4 * x) + 1.0
 
 
-def f3(x):
-    return x**2+x**3-5.0
+def cubic_quadratic_polynomial(x):
+    # Function 3: Polynomial function with cubic and quadratic terms
+    return x ** 2 + x ** 3 - 5.0
 
 
-def f4(x):
+def absolute_value(x):
+    # Function 4: Absolute value function (non-differentiable at x=0)
     return np.abs(x)
 
 
-def f5(x):
+def exponential_growth(x):
+    # Function 5: Exponential growth function
     return np.exp(x)
 
 
-def f6(x):
-    return np.sin(5*x) + x
+def sine_plus_linear(x):
+    # Function 6: Combination of sine wave and linear function
+    return np.sin(5 * x) + x
