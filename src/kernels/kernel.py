@@ -36,6 +36,7 @@ class Kernel(ABC):
 
     @abstractmethod
     def __call__(self, X1, X2=None, eval_gradient=False):
+        """abstract method for __call__ """
 
     def __add__(self, other):
         if not isinstance(other, Kernel):

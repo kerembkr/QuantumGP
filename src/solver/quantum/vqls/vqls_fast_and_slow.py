@@ -1,17 +1,12 @@
-# import os
-# import sys
-# SCRIPT_DIR = os.path.abspath(__file__)
-# sys.path.append(os.path.dirname(SCRIPT_DIR))
-
-import utils.utils as utils
+import src.utils_gpr.utils as utils
 from skopt import gp_minimize
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
-from utils.ansatz import *
-from utils.embedding import *
-from optimizers.optim_qml import *
-from utils.backend import DefaultQubit, LightningQubit
-
+from src.qutils.ansatz import *
+from src.qutils.embedding import *
+from src.optimizers.optim_qml import *
+from src.qutils.backend import DefaultQubit, LightningQubit
+from src.qutils.qutils import get_paulis, plot_costs, get_random_ls
 
 
 class FastSlowVQLS:
@@ -25,7 +20,7 @@ class FastSlowVQLS:
         self.nqubits = int(np.log(len(b)) / np.log(2))
 
         # Pauli decomposition
-        self.mats, self.wires, self.c = utils.get_paulis(self.A)
+        self.mats, self.wires, self.c = get_paulis(self.A)
 
         # quantum circuit
         self.optimizer = None
@@ -112,12 +107,12 @@ class FastSlowVQLS:
         def qcircuit(weights):
 
             # First Hadamard gate applied to the ancillary qubit.
-            qml.Hadamard(wires=nqubits)
+            qml.Hadamard(wires=self.nqubits)
 
             # For estimating the imaginary part of the coefficient "mu", we must add a "-i"
             # phase gate.
             if part == "Im" or part == "im":
-                qml.PhaseShift(-np.pi / 2, wires=nqubits)
+                qml.PhaseShift(-np.pi / 2, wires=self.nqubits)
 
             # Variational circuit generating a guess for the solution vector |x>
             self.V(weights)
@@ -130,7 +125,7 @@ class FastSlowVQLS:
 
             # Controlled Z operator at position j. If j = -1, apply the identity.
             if j != -1:
-                qml.CZ(wires=[nqubits, j])
+                qml.CZ(wires=[self.nqubits, j])
 
             # Unitary U_b associated to the problem vector |b>.
             self.U_b(self.b)
@@ -139,10 +134,10 @@ class FastSlowVQLS:
             qml.adjoint(self.CA)(lp, self.mats, self.wires)
 
             # Second Hadamard gate applied to the ancillary qubit.
-            qml.Hadamard(wires=nqubits)
+            qml.Hadamard(wires=self.nqubits)
 
             # Expectation value of Z for the ancillary qubit.
-            return qml.expval(qml.PauliZ(wires=nqubits))
+            return qml.expval(qml.PauliZ(wires=self.nqubits))
 
         return qcircuit
 
@@ -299,7 +294,7 @@ class FastSlowVQLS:
                 psi_real = psi_real_qnode(weights)
                 psi_imag = psi_imag_qnode(weights)
                 psi_norm += self.c[l] * np.conj(self.c[lp]) * (psi_real + 1.0j * psi_imag)
-                for j in range(0, nqubits):
+                for j in range(0, self.nqubits):
                     mu_real_qnode = self.qlayer(l=l, lp=lp, j=j, part="Re")
                     mu_imag_qnode = self.qlayer(l=l, lp=lp, j=j, part="Im")
                     mu_real = mu_real_qnode(weights)
@@ -308,9 +303,9 @@ class FastSlowVQLS:
 
         # Cost function
         try:
-            return float(0.5 - 0.5 * abs(mu_sum) / (nqubits * abs(psi_norm)))
+            return float(0.5 - 0.5 * abs(mu_sum) / (self.nqubits * abs(psi_norm)))
         except TypeError:
-            return 0.5 - 0.5 * abs(mu_sum) / (nqubits * abs(psi_norm))
+            return 0.5 - 0.5 * abs(mu_sum) / (self.nqubits * abs(psi_norm))
 
     def solve_classic(self):
         return np.linalg.solve(self.A, self.b)
@@ -379,7 +374,7 @@ if __name__ == "__main__":
     maxiter = 10
 
     # random symmetric positive definite matrix
-    A0, b0 = utils.get_random_ls(nqubits, easy_example=True)
+    A0, b0 = get_random_ls(nqubits, easy_example=True)
 
     # init
     solver = FastSlowVQLS(A=A0, b=b0)
@@ -415,7 +410,7 @@ if __name__ == "__main__":
         wopts[optim.name] = wopt
 
     title = "{:s}    qubits = {:d}    layers = {:d}".format(ansatz_.__class__.__name__, nqubits, nlayers)
-    utils.plot_costs(data=cost_hists, save_png=True, title=title)
+    plot_costs(data=cost_hists, save_png=True, title=title)
 
     device_probs = LightningQubit(wires=nqubits, shots=10000)
 

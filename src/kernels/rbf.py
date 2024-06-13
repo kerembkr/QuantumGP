@@ -1,5 +1,5 @@
 import numpy as np
-from kernel import Kernel
+from src.kernels.kernel import Kernel
 
 
 class RBFKernel(Kernel):

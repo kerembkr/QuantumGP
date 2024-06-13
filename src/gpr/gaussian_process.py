@@ -1,17 +1,17 @@
-import os
-import sys
+# import os
+# import sys
 
-SCRIPT_DIR = os.path.abspath(__file__)
-sys.path.append(os.path.dirname(SCRIPT_DIR))
+# SCRIPT_DIR = os.path.abspath(__file__)
+# sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 import numpy as np
 import scipy.optimize
 from numpy.random import randn
 import matplotlib.pyplot as plt
 from operator import itemgetter
-from utils.utils import data_from_func, save_fig
+from src.utils_gpr.utils import data_from_func, save_fig
 from matplotlib.ticker import MaxNLocator
-from utils.kernel import RBFKernel, PeriodicKernel, LinearKernel
+from src.kernels.rbf import RBFKernel
 from input.testfuncs_1d import f1
 from scipy.linalg import cho_solve, cholesky, solve_triangular
 

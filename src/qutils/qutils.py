@@ -80,7 +80,7 @@ def plot_costs(data, save_png=False, title=None, log=False):
 
 
 def save_fig(name):
-    output_dir = '../../output/'
+    output_dir = '../output/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     plt.savefig(os.path.join(output_dir, name + ".png"))
