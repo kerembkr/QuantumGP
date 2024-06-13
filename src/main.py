@@ -1,9 +1,13 @@
 import numpy as np
-from gpr.gaussian_process import GP
-from src.vqls.vqls_fast_and_slow import FastSlowVQLS
-from src.utils.utils_gpr import data_from_func
-from src.utils.kernel import RBFKernel
-from input.testfuncs_1d import f1
+from BoostedGPR.src.input.testfuncs_1d import f1
+from BoostedGPR.src.gaussian_process import GP
+from BoostedGPR.src.utils.kernel import RBFKernel
+from BoostedGPR.src.utils.utils import data_from_func
+import sys
+print(sys.path)
+sys.path.append('/Users/kerembuekrue/Documents/code/VQBayesOpt/NoPlateauVQLS/src')
+from NoPlateauVQLS.src.vqls_fast_and_slow import FastSlowVQLS
+
 
 # choose function
 X_train, X_test, y_train = data_from_func(f=f1, N=20, M=500, xx=[-2.0, 2.0, -4.0, 4.0], noise=0.1)
