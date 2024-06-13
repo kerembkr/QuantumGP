@@ -1,18 +1,10 @@
-# import os
-# import sys
-
-# SCRIPT_DIR = os.path.abspath(__file__)
-# sys.path.append(os.path.dirname(SCRIPT_DIR))
-
 import numpy as np
 import scipy.optimize
 from numpy.random import randn
 import matplotlib.pyplot as plt
 from operator import itemgetter
-from src.utils_gpr.utils import data_from_func, save_fig
+from src.utils_gpr.utils import save_fig
 from matplotlib.ticker import MaxNLocator
-from src.kernels.rbf import RBFKernel
-from input.testfuncs_1d import f1
 from scipy.linalg import cho_solve, cholesky, solve_triangular
 
 
@@ -191,10 +183,11 @@ class GP:
         else:
             return loglik
 
-    def plot_samples(self, nsamples):
+    def plot_samples(self, nsamples, save_png=False):
         """
         Plot samples with GP Model
 
+        :param save_png:
         :param nsamples: number of samples
         :return: None
         """
@@ -202,9 +195,6 @@ class GP:
         noise = 0.1
 
         K = self.kernel(self.X_train)
-
-        # prior samples:
-        prior_samples = cholesky(K + self.alpha_ * np.eye(len(self.X_train))) @ randn(len(self.X_train), nsamples)
 
         # plot
         fig, ax = plt.subplots(1, 1, figsize=(8, 6))
@@ -215,14 +205,23 @@ class GP:
         ax.tick_params(direction="in", labelsize=15, length=10, width=0.8, colors='k')
         for edge in ["top", "bottom", "left", "right"]:
             ax.spines[edge].set_linewidth(2.0)
-        print(self.X_train)
-        print(self.y_train)
-        
-        plt.plot(self.X_train, self.y_train, "*")
-        plt.plot(self.X_train, prior_samples + noise * randn(self.n, nsamples), ".")
 
+        # Sort the data by the x-axis
+        sorted_indices = np.argsort(self.X_train)
+        X_train_sorted = self.X_train[sorted_indices]
+        y_train_sorted = np.array(self.y_train)[sorted_indices]
+        prior_samples = cholesky(K + self.alpha_ * np.eye(len(self.X_train))) @ randn(len(self.X_train), nsamples)
+        n = X_train_sorted.shape[0]
+        plt.plot(X_train_sorted, y_train_sorted, ".-", label="Training Data")
+        plt.plot(X_train_sorted, prior_samples + noise * randn(n, nsamples), ".-", alpha=0.3)
+        # plt.plot(X_train_sorted, prior_samples + self.alpha_ * randn(n, nsamples), ".-")
+        delta = (max(self.y_train)-min(self.y_train))/5.0
+        ax.set_ylim([min(self.y_train)-delta, max(self.y_train)+delta])
+
+        plt.legend()
         # save sample plots
-        save_fig("samples")
+        if save_png:
+            save_fig("samples")
 
     def plot_gp(self, X, mu, cov, post=False):
         delta = 1.96
@@ -257,40 +256,3 @@ class GP:
             save_fig("posterior")
         else:
             save_fig("prior")
-
-
-if __name__ == "__main__":
-
-    # fix random seed for reproducibility test
-    # np.random.seed(42)
-
-    # choose function
-    X_train, X_test, y_train = data_from_func(f=f1, N=20, M=500, xx=[-2.0, 2.0, -4.0, 4.0], noise=0.1)
-    # X_train, X_test, y_train = data_from_func(f=f6, N=500, M=500, xx=[0.0, 10.0, 0.0, 20.0], noise=0.1)
-
-    # choose kernel
-    kernel1 = RBFKernel(theta=[2.0, 100.0]) * PeriodicKernel(theta=[1.0, 1.0, 1.0])
-    kernel2 = LinearKernel(theta=[1.0, 1.0, 1.0])
-    kernel3 = RBFKernel(theta=[50.0, 50.0])
-    kernel4 = RBFKernel(theta=[0.1, 0.1])
-    kernel = kernel1 + kernel2 + kernel3 + kernel4
-    print(kernel)
-
-    # noise
-    eps = 0.1
-
-    # create GP model
-    model = GP(kernel=kernel, optimizer="fmin_l_bfgs_b", alpha_=eps ** 2, n_restarts_optimizer=2)
-
-    # fit
-    model.fit(X_train, y_train)
-
-    # predict
-    y_mean, y_cov = model.predict(X_test)
-
-    # plot prior
-    model.plot_gp(X=X_test, mu=np.zeros(len(X_test)), cov=model.kernel(X_test))
-    # plot posterior
-    model.plot_gp(X=X_test, mu=y_mean, cov=y_cov, post=True)
-    # plot samples
-    model.plot_samples(2)

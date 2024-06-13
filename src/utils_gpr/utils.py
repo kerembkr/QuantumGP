@@ -19,7 +19,7 @@ def data_from_func(f, N, M, xx, noise=0.1):
     xmin_tr, xmax_tr, xmin_te, xmax_te = xx
 
     # training data
-    X_train = np.array([np.random.rand() * (xmax_tr - xmin_tr) + xmin_tr for _ in range(N)])
+    X_train = np.linspace(xmin_tr, xmax_tr, N)
     y_train = [f(X_) + np.random.rand() * 2 * noise - noise for X_ in X_train]
 
     # testing data

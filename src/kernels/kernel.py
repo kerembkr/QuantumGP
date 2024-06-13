@@ -86,7 +86,7 @@ class Sum(Kernel):
             K2, K2_gradient = self.kernel2(X1, X2, eval_gradient=True)
             return K1 + K2, [*K1_gradient, *K2_gradient]
         else:
-            return self.kernel1(X1, X2) + self.kernel2(X1, X2).squeeze()
+            return self.kernel1(X1, X2).squeeze() + self.kernel2(X1, X2).squeeze()
 
     def __repr__(self):
         return "{0} + {1}".format(self.kernel1, self.kernel2)
