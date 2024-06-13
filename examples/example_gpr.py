@@ -1,11 +1,8 @@
-from src.gpr.gaussian_process import GP
-from src.kernels.rbf import RBFKernel
-from src.kernels.linear import LinearKernel
-from src.kernels.periodic import PeriodicKernel
-from src.utils_gpr.utils import data_from_func
-from input.testfuncs_1d import (oscillatory_increasing_amplitude, sine_plus_linear, cubic_quadratic_polynomial,
-                                absolute_value, exponential_growth, high_frequency_sine)
 import numpy as np
+from src.kernels.rbf import RBFKernel
+from src.gpr.gaussian_process import GP
+from src.utils_gpr.utils import data_from_func
+from input.testfuncs_1d import oscillatory_increasing_amplitude
 
 # choose function
 func = oscillatory_increasing_amplitude
