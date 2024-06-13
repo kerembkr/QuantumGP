@@ -215,6 +215,9 @@ class GP:
         ax.tick_params(direction="in", labelsize=15, length=10, width=0.8, colors='k')
         for edge in ["top", "bottom", "left", "right"]:
             ax.spines[edge].set_linewidth(2.0)
+        print(self.X_train)
+        print(self.y_train)
+        
         plt.plot(self.X_train, self.y_train, "*")
         plt.plot(self.X_train, prior_samples + noise * randn(self.n, nsamples), ".")
 
