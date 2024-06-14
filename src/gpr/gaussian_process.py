@@ -9,10 +9,11 @@ from scipy.linalg import cho_solve, cholesky, solve_triangular
 
 
 class GP:
-    def __init__(self, kernel, optimizer=None, alpha_=1e-10, n_restarts_optimizer=0, solver="cholesky"):
+    def __init__(self, kernel, optimizer=None, alpha_=1e-10, n_restarts_optimizer=0, solver="cholesky", precon=None):
         self.optimizer = optimizer
         self.solver = solver
         self.alpha_ = alpha_
+        self.precon = precon
         self.n_targets = None
         self.alpha = None
         self.L = None
