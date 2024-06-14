@@ -15,7 +15,12 @@ kernel = RBFKernel(theta=[1.0, 1.0])
 eps = 0.1
 
 # create GP model
-model = GP(kernel=kernel, optimizer="fmin_l_bfgs_b", alpha_=eps ** 2, n_restarts_optimizer=5, solver="cholesky")
+model = GP(kernel=kernel,
+           optimizer="fmin_l_bfgs_b",
+           alpha_=eps ** 2,
+           n_restarts_optimizer=5,
+           solver="cholesky",
+           precon=None)
 
 # fit
 model.fit(X_train, y_train)

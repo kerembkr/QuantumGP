@@ -1,6 +1,4 @@
 import numpy as np
-from time import time
-
 
 
 def cg(_A, _b, maxiter=100, tol=1e-8):
