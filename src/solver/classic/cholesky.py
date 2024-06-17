@@ -1,7 +1,4 @@
 
-
-
-
 def cholesky_solve(L, b):
     """
   quadratic complexity O(n^2)
