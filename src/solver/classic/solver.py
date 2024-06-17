@@ -1,4 +1,5 @@
-
+import numpy as np
+from abc import abstractmethod
 
 class Solver:
 
@@ -8,16 +9,39 @@ class Solver:
         self.x = None
 
     def solve(self):
-        pass
+        self.x = np.linalg.solve(self.A, self.b)
+
+    @abstractmethod
+    def precon(self):
 
     @property
-    def vec_x(self):
-        return self.x
+    def x(self):
+        return self._x
+
+    @x.setter
+    def x(self, value):
+        self._x = value
 
     @property
-    def vec_b(self):
-        return self.b
+    def b(self):
+        return self._b
+
+    @b.setter
+    def b(self, value):
+        self._b = value
 
     @property
-    def mat_A(self):
-        return self.A
+    def A(self):
+        return self._A
+
+    @A.setter
+    def A(self, value):
+        self._A = value
+
+# Example usage
+A = np.array([[3, 1], [1, 2]])
+b = np.array([9, 8])
+
+solver = Solver(A, b)
+solver.solve()
+print("Solution x:", solver.x)
