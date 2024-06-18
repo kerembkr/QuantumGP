@@ -8,6 +8,7 @@ class Solver:
         self.A = A
         self.b = b
         self.x = None
+        self.N = len(b)
 
     def solve(self):
         self.x = np.linalg.solve(self.A, self.b)

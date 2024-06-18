@@ -4,17 +4,19 @@ from src.solver.classic.pcg import PCG
 from src.solver.classic.solver import Solver
 
 # Example usage
-A = np.array([[3, 1], [1, 2]])
-b = np.array([9, 8])
+np.random.seed(42)
+N = 1000
+A = np.random.rand(N, N)
+A = A @ A.T
+b = np.random.rand(N)
 
 solver_basic = Solver(A, b)
 solver_basic.solve()
-print("Solution x:", solver_basic.x)
 
-solver_cg = CG(A, b, maxiter=20)
+solver_cg = CG(A, b, maxiter=10*N)
 solver_cg.solve()
-print("Solution x:", solver_cg.x)
+print(solver_cg.iters)
 
-solver_pcg = PCG(A, b, maxiter=20, M=np.diag(np.diag(A)))
+solver_pcg = PCG(A, b, maxiter=10*N, M=np.diag(np.diag(A)))
 solver_pcg.solve()
-print("Solution x:", solver_pcg.x)
+print(solver_pcg.iters)
