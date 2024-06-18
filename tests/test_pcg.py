@@ -1,5 +1,6 @@
 import numpy as np
 from src.solver.classic.cg import CG
+from src.solver.classic.pcg import PCG
 from src.solver.classic.solver import Solver
 
 # Example usage
@@ -13,3 +14,7 @@ print("Solution x:", solver_basic.x)
 solver_cg = CG(A, b, maxiter=20)
 solver_cg.solve()
 print("Solution x:", solver_cg.x)
+
+solver_pcg = PCG(A, b, maxiter=20, M=np.diag(np.diag(A)))
+solver_pcg.solve()
+print("Solution x:", solver_pcg.x)

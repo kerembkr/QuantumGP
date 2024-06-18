@@ -1,58 +1,39 @@
+import numpy as np
+from src.solver.classic.solver import Solver
 
-def pcg(_A, _b, invP=None, maxiter=None, atol=1e-8, rtol=1e-8):
-    """
-    Preconditioned Conjugate Gradients (PCG)
 
-    Args
-    -------
-    _A       : symmetric positive definite matrix (N x N)
-    _b       : right hand side vector (N x 1)
-    invP    : inverse of preconditioning matrix (N x N)
-    maxiter : max. number of iterations (int)
-    atol    : absolute tolerance (float)
-    rtol    : relative tolerance (float)
+class PCG(Solver):
 
-    Returns
-    -------
-    x       : approximate solution of linear system (N x 1)
+    def __init__(self, A, b, M=None, maxiter=20, tol=1e-8):
+        super().__init__(A, b)
+        self.M = M if M is not None else np.eye(A.shape[0])
+        self.maxiter = maxiter
+        self.tol = tol
 
-    """
+    def solve(self):
+        """
+        Conjugate Gradient Method with Preconditioning
+        """
 
-    n = len(_b)
+        self.x = np.zeros(len(self.A))                  # initial solution guess
+        r = self.b - self.A @ self.x                    # initial residual
+        z = np.linalg.solve(self.M, r)                  # apply preconditioner
+        d = z.copy()                                    # initial search direction
+        delta_new: float = r.T @ z                      # initial squared residual
+        i: int = 0                                      # iteration counter
 
-    # without preconditioning
-    if invP is None:
-        invP = np.eye(len(_A))
+        while (np.sqrt(delta_new) > self.tol) and (i < self.maxiter):
 
-    # maximum number of iterations
-    if maxiter is None:
-        maxiter = n * 10
-
-    x = np.zeros(len(_A))  # current solution
-    r = _b - _A @ x
-
-    for j in range(maxiter):
-        # print(j, np.linalg.norm(r))
-        if np.linalg.norm(r) < atol:  # convergence achieved?
-            return x, 0
-
-        z = invP @ r
-        rho_cur = r.T @ z
-        if j > 0:
-            beta = rho_cur / rho_prev
-            p *= beta
-            p += z
-        else:
-            p = np.zeros(len(_b))
-            p[:] = z[:]
-
-        q = _A @ p
-        alpha = rho_cur / (p.T @ q)
-
-        x += alpha * p
-        r -= alpha * q
-        rho_prev = rho_cur
-
-    else:
-        # return incomplete progress
-        return x, maxiter
+            q = self.A @ d                              # matrix-vector product Ad
+            alpha: float = delta_new / (d.T @ q)        # step size
+            self.x = self.x + alpha * d                 # update solution
+            r = r - alpha * q                           # update residual
+            z = np.linalg.solve(self.M, r)              # apply preconditioner
+            delta_old: float = delta_new                # save old squared residual
+            delta_new = r.T @ z                         # new squared residual
+            print(np.sqrt(delta_new))
+            beta: float = delta_new / delta_old         # calculate beta
+            d = z + beta * d                            # update search direction
+            i += 1                                      # update iteration counter
+            if i == self.maxiter:                       # convergence criteria
+                raise BaseException("no convergence")   # no convergence
