@@ -10,6 +10,6 @@ solver_basic = Solver(A, b)
 solver_basic.solve()
 print("Solution x:", solver_basic.x)
 
-solver_cg = CG(A, b)
+solver_cg = CG(A, b, maxiter=20)
 solver_cg.solve()
 print("Solution x:", solver_cg.x)

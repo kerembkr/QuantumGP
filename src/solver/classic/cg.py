@@ -1,5 +1,5 @@
 import numpy as np
-from solver import Solver
+from src.solver.classic.solver import Solver
 
 
 class CG(Solver):
@@ -14,33 +14,32 @@ class CG(Solver):
     def solve(self):
         """
         Conjugate Gradient Method
-
         """
-        self.x = np.zeros(len(self.A))
 
-        # initialization
-        r = self.b - self.A @ self.x
-        d = np.zeros(len(self.b))
-        i = 0
+        self.x = np.zeros(len(self.A))                  # initial solution guess
+        r = self.b - self.A @ self.x                    # initial residual
+        d = r.copy()                                    # initial search direction
+        delta_new: float = r.T @ r                      # initial squared residual
+        i: int = 0                                      # iteration counter
 
-        while (np.linalg.norm(r) > self.tol) and (i <= self.maxiter):
+        while (np.sqrt(delta_new) > self.tol) and (i < self.maxiter):
+            q = self.A @ d                              # matrix-vector product Ad
+            alpha: float = delta_new / (d.T @ q)        # step size
+            self.x = self.x + alpha * d                 # update solution
+            r = r - alpha * q                           # update residual
+            delta_old: float = delta_new                # save old squared residual
+            delta_new = r.T @ r                         # new squared residual
+            beta: float = delta_new / delta_old         # calculate beta
+            d = r + beta * d                            # update search direction
+            i += 1                                      # update iteration counter
+            if i == self.maxiter:                       # convergence criteria
+                raise BaseException("no convergence")   # no convergence
 
-            # residual
-            r = self.b - self.A @ self.x
 
-            # search direction
-            if i == 0:
-                dp = r
-            else:
-                dp = r - (r.T @ (self.A @ d)) / (d.T @ (self.A @ d)) * d
+if __name__ == "__main__":
+    A_ = np.array([[3, 1], [1, 2]])
+    b_ = np.array([9, 8])
+    solver = CG(A_, b_, maxiter=10)
+    solver.solve()
+    print("Solution:", solver.x)
 
-            # solution estimate
-            self.x = self.x + (r.T @ r) / (dp.T @ (self.A @ dp)) * dp
-
-            # update iteration counter
-            i += 1
-            d = dp
-
-            # convergence criteria
-            if i == self.maxiter:
-                raise BaseException("no convergence")
