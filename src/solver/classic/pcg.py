@@ -1,5 +1,6 @@
 import numpy as np
 from src.solver.classic.solver import Solver
+from src.utils_gpr.utils import timing
 
 
 class PCG(Solver):
@@ -11,12 +12,13 @@ class PCG(Solver):
         self.maxiter = maxiter
         self.tol = tol
 
+    @timing
     def solve(self):
         """
         Conjugate Gradient Method with Preconditioning
         """
 
-        self.x = np.zeros(len(self.A))                                  # initial solution guess
+        self.x = np.zeros(self.N)                                       # initial solution guess
         r = self.b - self.A @ self.x                                    # initial residual
         z = np.linalg.solve(self.M, r)                                  # apply preconditioner
         d = z.copy()                                                    # initial search direction

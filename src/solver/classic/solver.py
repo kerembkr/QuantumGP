@@ -1,5 +1,6 @@
 import numpy as np
 from abc import abstractmethod
+from src.utils_gpr.utils import timing
 
 
 class Solver:
@@ -10,11 +11,9 @@ class Solver:
         self.x = None
         self.N = len(b)
 
+    @timing
     def solve(self):
         self.x = np.linalg.solve(self.A, self.b)
-
-    # @abstractmethod
-    # def precon(self):
 
     @property
     def x(self):
@@ -39,3 +38,7 @@ class Solver:
     @A.setter
     def A(self, value):
         self._A = value
+
+    @property
+    def condA(self):
+        return np.linalg.cond(self._A)

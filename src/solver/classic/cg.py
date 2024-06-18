@@ -1,5 +1,6 @@
 import numpy as np
 from src.solver.classic.solver import Solver
+from src.utils_gpr.utils import timing
 
 
 class CG(Solver):
@@ -10,13 +11,14 @@ class CG(Solver):
         self.maxiter: int = maxiter
         self.tol: float = tol
 
+    @timing
     def solve(self):
         """
         Conjugate Gradient Method
 
         """
 
-        self.x = np.zeros(len(self.A))                                  # initial solution guess
+        self.x = np.zeros(self.N)                                       # initial solution guess
         r = self.b - self.A @ self.x                                    # initial residual
         d = r.copy()                                                    # initial search direction
         delta_new: float = r.T @ r                                      # initial squared residual
