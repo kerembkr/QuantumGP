@@ -1,6 +1,7 @@
 import numpy as np
 from abc import abstractmethod
 
+
 class Solver:
 
     def __init__(self, A, b):
@@ -11,8 +12,8 @@ class Solver:
     def solve(self):
         self.x = np.linalg.solve(self.A, self.b)
 
-    @abstractmethod
-    def precon(self):
+    # @abstractmethod
+    # def precon(self):
 
     @property
     def x(self):
@@ -37,11 +38,3 @@ class Solver:
     @A.setter
     def A(self, value):
         self._A = value
-
-# Example usage
-A = np.array([[3, 1], [1, 2]])
-b = np.array([9, 8])
-
-solver = Solver(A, b)
-solver.solve()
-print("Solution x:", solver.x)

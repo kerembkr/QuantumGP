@@ -1,41 +1,46 @@
+import numpy as np
+from solver import Solver
 
-def cg(_A, _b, maxiter=100, tol=1e-8):
-    """
-    Conjugate Gradient Method
 
-    :param _A: matrix
-    :param _b: vector
-    :param maxiter: maximum number of iterations
-    :param tol: tolerance
-    :return: solution vector x
-    """
-    x = np.zeros(len(_A))
+class CG(Solver):
 
-    # initialization
-    r = _b - _A @ x
-    d = np.zeros(len(_b))
-    i = 0
+    def __init__(self, A, b, maxiter=None, tol=1e-8):
+        super().__init__(A, b)
+        self.maxiter = maxiter
+        self.tol = tol
+        if maxiter is None:
+            self.maxiter = len(b)
 
-    while (np.linalg.norm(r) > tol) and (i <= maxiter):
+    def solve(self):
+        """
+        Conjugate Gradient Method
 
-        # residual
-        r = _b - _A @ x
+        """
+        self.x = np.zeros(len(self.A))
 
-        # search direction
-        if i == 0:
-            dp = r
-        else:
-            dp = r - (r.T @ (_A @ d)) / (d.T @ (_A @ d)) * d
+        # initialization
+        r = self.b - self.A @ self.x
+        d = np.zeros(len(self.b))
+        i = 0
 
-        # solution estimate
-        x = x + (r.T @ r) / (dp.T @ (_A @ dp)) * dp
+        while (np.linalg.norm(r) > self.tol) and (i <= self.maxiter):
 
-        # update iteration counter
-        i += 1
-        d = dp
+            # residual
+            r = self.b - self.A @ self.x
 
-        # convergence criteria
-        if i == maxiter:
-            raise BaseException("no convergence")
+            # search direction
+            if i == 0:
+                dp = r
+            else:
+                dp = r - (r.T @ (self.A @ d)) / (d.T @ (self.A @ d)) * d
 
-    return x
+            # solution estimate
+            self.x = self.x + (r.T @ r) / (dp.T @ (self.A @ dp)) * dp
+
+            # update iteration counter
+            i += 1
+            d = dp
+
+            # convergence criteria
+            if i == self.maxiter:
+                raise BaseException("no convergence")
