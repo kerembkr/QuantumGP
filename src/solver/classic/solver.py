@@ -39,8 +39,6 @@ class Solver:
     def N(self, value):
         self._N = value
 
-
-
     @property
     def A(self):
         return self._A

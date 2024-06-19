@@ -54,6 +54,8 @@ class GP:
 
         K_[np.diag_indices_from(K_)] += self.alpha_
 
+        #self.solver.
+
         # K_ = L*L^T --> L
         self.L = cholesky(K_, lower=True, check_finite=False)
 
