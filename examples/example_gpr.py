@@ -3,6 +3,9 @@ from src.kernels.rbf import RBFKernel
 from src.gpr.gaussian_process import GP
 from src.utils_gpr.utils import data_from_func
 from input.testfuncs_1d import oscillatory_increasing_amplitude
+from src.solver.classic.solver import Solver
+from src.solver.classic.cg import CG
+from src.solver.classic.pcg import PCG
 
 # choose function
 func = oscillatory_increasing_amplitude
@@ -14,12 +17,15 @@ kernel = RBFKernel(theta=[1.0, 1.0])
 # noise
 eps = 0.1
 
+# choose solver
+solver = Solver()
+
 # create GP model
 model = GP(kernel=kernel,
            optimizer="fmin_l_bfgs_b",
            alpha_=eps ** 2,
            n_restarts_optimizer=5,
-           solver="cholesky",
+           solver=solver,
            precon=None)
 
 # fit

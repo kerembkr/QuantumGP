@@ -5,11 +5,11 @@ from src.utils_gpr.utils import timing
 
 class Solver:
 
-    def __init__(self, A, b):
-        self.A = A
-        self.b = b
+    def __init__(self):
+        self.A = None
+        self.b = None
         self.x = None
-        self.N = len(b)
+        self.N = None
 
     @timing
     def solve(self):
@@ -30,6 +30,16 @@ class Solver:
     @b.setter
     def b(self, value):
         self._b = value
+
+    @property
+    def N(self):
+        return self._N
+
+    @N.setter
+    def N(self, value):
+        self._N = value
+
+
 
     @property
     def A(self):
