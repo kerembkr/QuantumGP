@@ -9,7 +9,7 @@ from scipy.linalg import cho_solve, cholesky, solve_triangular
 
 
 class GP:
-    def __init__(self, kernel, optimizer=None, alpha_=1e-10, n_restarts_optimizer=0, solver="cholesky", precon=None):
+    def __init__(self, kernel, optimizer=None, alpha_=1e-10, n_restarts_optimizer=0, solver=None, precon=None):
         self.optimizer = optimizer
         self.solver = solver
         self.alpha_ = alpha_
@@ -54,13 +54,20 @@ class GP:
 
         K_[np.diag_indices_from(K_)] += self.alpha_
 
-        #self.solver.
+        # NEW
+        self.solver.N = self.n
+        self.solver.b = self.y_train
+        self.solver.A = K_
+        self.solver.solve()
+        self.alpha = self.solver.x
 
+
+        # OLD (CHOLESKY)
         # K_ = L*L^T --> L
         self.L = cholesky(K_, lower=True, check_finite=False)
 
         #  alpha = L^T \ (L \ y)
-        self.alpha = cho_solve((self.L, True), self.y_train, check_finite=False)
+        #self.alpha = cho_solve((self.L, True), self.y_train, check_finite=False)
 
         return self
 
