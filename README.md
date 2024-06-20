@@ -10,6 +10,10 @@ Classical Solvers
 - Conjugate Gradient (CG)
 - Preconditioned Conjugate Gradient (PCG)
 
+Decomposition
+- LU
+- Cholesky
+
 Preconditioners
 - Incomplete LU
 - Incomplete Cholesky
