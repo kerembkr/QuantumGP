@@ -17,8 +17,8 @@ kernel = RBFKernel(theta=[1.0, 1.0])
 eps = 0.1
 
 # choose solver
-solver = Solver()
-# solver = CG()
+# solver = Solver()
+solver = CG()
 
 # create GP model
 model = GP(kernel=kernel,

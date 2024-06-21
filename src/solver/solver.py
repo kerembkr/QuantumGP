@@ -1,7 +1,6 @@
 import numpy as np
 from src.utils.utils import timing
 
-
 class Solver:
 
     def __init__(self):
@@ -12,6 +11,8 @@ class Solver:
 
     @timing
     def solve(self):
+        if self._A is None or self._b is None:
+            raise ValueError("Matrix A and vector b must be set before solving.")
         self._x = np.linalg.solve(self._A, self._b)
 
     @property
@@ -53,4 +54,6 @@ class Solver:
 
     @property
     def condA(self):
+        if self._A is None:
+            raise ValueError("Matrix A must be set to calculate condition number.")
         return np.linalg.cond(self._A)

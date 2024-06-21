@@ -56,7 +56,9 @@ class GP:
 
         # NEW
         self.solver.set_lse(A=K_, b=self.y_train)
-        self.solver.solve()
+        # self.solver.solve()
+        self.solver.python_cg
+        print(self.solver.x)
         self.alpha = self.solver.x
 
         # OLD (CHOLESKY)
