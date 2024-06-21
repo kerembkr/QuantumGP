@@ -228,7 +228,7 @@ class GP:
         for edge in ["top", "bottom", "left", "right"]:
             ax.spines[edge].set_linewidth(2.0)
         plt.plot(X_test, -self.acq_func(X_test, self.f_star))
-        save_fig("acquisition")
+        save_fig("acquisition" + "_" + str(len(self.X_train)))
 
 
 
@@ -302,6 +302,7 @@ class GP:
         ax.imshow(P, extent=[xmin, xmax, ymin, ymax], aspect="auto", origin="lower", cmap="Purples", alpha=0.6)
 
         if post:
-            save_fig("posterior")
+            # save_fig("posterior")
+            save_fig("posterior" + "_" + str(len(self.X_train)))
         else:
             save_fig("prior")
