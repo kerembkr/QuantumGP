@@ -17,13 +17,3 @@ solver_basic.b = b
 solver_basic.A = A
 solver_basic.solve()
 
-
-#
-# solver_cg = CG(A, b, maxiter=10*N)
-# solver_cg.solve()
-# print(solver_cg.iters)
-#
-# A_sparse = csc_matrix(A)
-# solver_pcg = PCG(A_sparse, b, maxiter=10*N, M=np.diag(np.diag(A)))
-# solver_pcg.solve()
-# print(solver_pcg.iters)
