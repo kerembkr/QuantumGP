@@ -6,10 +6,11 @@ from operator import itemgetter
 from src.utils.utils import save_fig
 from matplotlib.ticker import MaxNLocator
 from scipy.linalg import cholesky, solve_triangular
-
+from src.utils.acquisition import ExpectedImprovement
 
 class GP:
-    def __init__(self, kernel, optimizer=None, alpha_=1e-10, n_restarts_optimizer=0, solver=None, precon=None):
+    def __init__(self, kernel, optimizer=None, alpha_=1e-10, n_restarts_optimizer=0, solver=None, precon=None,
+                 acq_func=None):
         self.optimizer = optimizer
         self.solver = solver
         self.alpha_ = alpha_
@@ -23,6 +24,7 @@ class GP:
         self.kernel = kernel
         self.n = None
         self.n_restarts_optimizer = n_restarts_optimizer
+        self.acq_func = acq_func
 
     def fit(self, X, y):
         """Fit Gaussian process regression model.
@@ -190,6 +192,44 @@ class GP:
             return loglik, dloglik
         else:
             return loglik
+
+    def select_next_point(self):
+        """
+        Select the next point to evaluate the objective function using the acquisition function.
+
+        Returns
+        -------
+        array_like
+            The next point to evaluate.
+        """
+        self.f_star = np.min(self.y_train)  # Current best known function value
+        self.acq_func = ExpectedImprovement(model=self, bounds=[(min(self.X_train), max(self.X_train))])
+
+        opt_res = scipy.optimize.minimize(
+            self.acq_func,
+            # np.zeros(self.X_train.shape[1]),
+            np.zeros(1),
+            args=(self.f_star,),
+            method="L-BFGS-B",
+            bounds=self.acq_func.bounds,
+            options={'disp': False}
+        )
+
+        return opt_res.x
+
+    def plot_acquisition(self, X_test):
+        fig, ax = plt.subplots(1, 1, figsize=(8, 6))
+        ax.set_xlabel("$X$", fontsize=15)
+        ax.set_ylabel("$EI$", fontsize=15)
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.tick_params(direction="in", labelsize=15, length=10, width=0.8, colors='k')
+        for edge in ["top", "bottom", "left", "right"]:
+            ax.spines[edge].set_linewidth(2.0)
+        plt.plot(X_test, -self.acq_func(X_test, self.f_star))
+        save_fig("acquisition")
+
+
 
     def plot_samples(self, nsamples, save_png=False):
         """

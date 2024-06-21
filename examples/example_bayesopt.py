@@ -10,7 +10,7 @@ from src.solver.classic.cholesky import Cholesky
 
 # choose function
 func = oscillatory_increasing_amplitude
-X_train, X_test, y_train = data_from_func(f=func, N=30, M=500, xx=[0.0, 4.0, -2.0, 6.0], noise=0.1)
+X_train, X_test, y_train = data_from_func(f=func, N=2, M=500, xx=[0.0, 4.0, -2.0, 6.0], noise=0.1)
 
 # choose kernel
 kernel = RBFKernel(theta=[1.0, 1.0])
@@ -24,13 +24,17 @@ solver = Cholesky()
 # choose preconditioner
 precon = None
 
+# choose acquisition function
+acq_func = "EI"
+
 # create GP model
 model = GP(kernel=kernel,
            optimizer="fmin_l_bfgs_b",
            alpha_=eps ** 2,
            n_restarts_optimizer=5,
            solver=solver,
-           precon=precon)
+           precon=precon,
+           acq_func=acq_func)
 
 # fit
 model.fit(X_train, y_train)
@@ -44,3 +48,7 @@ model.plot_gp(X=X_test, mu=np.zeros(len(X_test)), cov=model.kernel(X_test))
 model.plot_gp(X=X_test, mu=y_mean, cov=y_cov, post=True)
 # plot samples
 model.plot_samples(5, save_png=True)
+
+test = model.select_next_point()
+model.plot_acquisition(X_test)
+print(test)

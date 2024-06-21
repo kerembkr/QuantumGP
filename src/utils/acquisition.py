@@ -1,11 +1,13 @@
+import numpy as np
 from scipy.stats import norm
 from abc import ABC, abstractmethod
 
 
 class Acquisition(ABC):
 
-    def __init__(self, model):
+    def __init__(self, model, bounds):
         self.model = model
+        self.bounds = bounds
 
     @abstractmethod
     def __call__(self):
@@ -14,8 +16,8 @@ class Acquisition(ABC):
 
 class ExpectedImprovement(Acquisition):
     
-    def __init__(self, model, xi=0.0):
-        super().__init__(model)
+    def __init__(self, model, bounds, xi=0.0):
+        super().__init__(model, bounds)
         self.xi = xi
 
     def __call__(self, x, f_star):
@@ -39,10 +41,12 @@ class ExpectedImprovement(Acquisition):
         # get mean and standard deviation of point x
         mu, sig = self.model.predict(x)
 
+        sig = np.diagonal(sig)
+
         # helping value for simplicity
         arg = (mu-f_star-self.xi)/sig
 
         # expected improvement
         EI = arg * sig * norm.cdf(arg) + sig * norm.cdf(arg)
 
-        return EI
+        return -EI
