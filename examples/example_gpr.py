@@ -2,10 +2,11 @@ import numpy as np
 from src.kernels.rbf import RBFKernel
 from src.gpr.gaussian_process import GP
 from src.utils.utils import data_from_func
-from src.solver.solver import Solver
 from input.testfuncs_1d import oscillatory_increasing_amplitude
+from src.solver.solver import Solver
 from src.solver.classic.cg import CG
 from src.solver.classic.pcg import PCG
+from src.solver.classic.cholesky import Cholesky
 
 # choose function
 func = oscillatory_increasing_amplitude
@@ -18,8 +19,7 @@ kernel = RBFKernel(theta=[1.0, 1.0])
 eps = 0.1
 
 # choose solver
-# solver = Solver()
-solver = PCG()
+solver = Cholesky()
 
 # create GP model
 model = GP(kernel=kernel,
