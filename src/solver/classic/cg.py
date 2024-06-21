@@ -1,12 +1,12 @@
 import numpy as np
-from src.solver.classic.solver import Solver
-from src.utils_gpr.utils import timing
+from src.solver.solver import Solver
+from src.utils.utils import timing
 
 
 class CG(Solver):
 
-    def __init__(self, A, b, maxiter=20, tol=1e-8):
-        super().__init__(A, b)
+    def __init__(self, maxiter=20, tol=1e-8):
+        super().__init__()
         self.iters: int = 0
         self.maxiter: int = maxiter
         self.tol: float = tol

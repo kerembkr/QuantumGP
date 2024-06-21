@@ -3,9 +3,9 @@ import scipy.optimize
 from numpy.random import randn
 import matplotlib.pyplot as plt
 from operator import itemgetter
-from src.utils_gpr.utils import save_fig
+from src.utils.utils import save_fig
 from matplotlib.ticker import MaxNLocator
-from scipy.linalg import cho_solve, cholesky, solve_triangular
+from scipy.linalg import cholesky, solve_triangular
 
 
 class GP:
@@ -55,12 +55,9 @@ class GP:
         K_[np.diag_indices_from(K_)] += self.alpha_
 
         # NEW
-        self.solver.N = self.n
-        self.solver.b = self.y_train
-        self.solver.A = K_
+        self.solver.set_lse(A=K_, b=self.y_train)
         self.solver.solve()
         self.alpha = self.solver.x
-
 
         # OLD (CHOLESKY)
         # K_ = L*L^T --> L

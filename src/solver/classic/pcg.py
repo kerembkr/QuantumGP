@@ -1,6 +1,6 @@
 import numpy as np
-from src.solver.classic.solver import Solver
-from src.utils_gpr.utils import timing
+from src.solver.solver import Solver
+from src.utils.utils import timing
 
 
 class PCG(Solver):

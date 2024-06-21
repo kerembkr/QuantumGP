@@ -1,4 +1,4 @@
-# VQBayesOpt
+# QuantumGP
 Using Quantum Speed-Ups to accelerate Gaussian Process Regression (GPR)
 
 Quantum Solvers

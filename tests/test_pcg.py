@@ -1,8 +1,5 @@
 import numpy as np
-from src.solver.classic.cg import CG
-from src.solver.classic.pcg import PCG
-from src.solver.classic.solver import Solver
-from scipy.sparse import csc_matrix
+from src.solver.solver import Solver
 
 # Example usage
 np.random.seed(42)

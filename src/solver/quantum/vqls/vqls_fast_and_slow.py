@@ -1,12 +1,12 @@
-import src.utils_gpr.utils as utils
+import src.utils.utils as utils
 from skopt import gp_minimize
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
-from src.qutils.ansatz import *
-from src.qutils.embedding import *
+from src.utils.ansatz import *
+from src.utils.embedding import *
 from src.optimizers.optim_qml import *
-from src.qutils.backend import DefaultQubit, LightningQubit
-from src.qutils.qutils import get_paulis, plot_costs, get_random_ls
+from src.utils.backend import DefaultQubit, LightningQubit
+from src.utils.qutils import get_paulis, plot_costs, get_random_ls
 
 
 class FastSlowVQLS:

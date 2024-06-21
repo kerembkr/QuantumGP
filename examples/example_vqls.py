@@ -1,10 +1,10 @@
-from src.qutils.ansatz import *
-from src.qutils.embedding import *
+from src.utils.ansatz import *
+from src.utils.embedding import *
 from src.optimizers.optim_qml import *
-from src.qutils.backend import DefaultQubit, LightningQubit
-from src.qutils.qutils import get_random_ls
+from src.utils.backend import DefaultQubit, LightningQubit
+from src.utils.qutils import get_random_ls
 from src.solver.quantum.vqls.vqls_fast_and_slow import FastSlowVQLS
-from src.qutils.qutils import plot_costs
+from src.utils.qutils import plot_costs
 
 # reproducibility
 # np.random.seed(42)
