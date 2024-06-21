@@ -11,6 +11,7 @@ from src.utils.acquisition import ExpectedImprovement
 class GP:
     def __init__(self, kernel, optimizer=None, alpha_=1e-10, n_restarts_optimizer=0, solver=None, precon=None,
                  acq_func=None):
+        self.f_star = None
         self.optimizer = optimizer
         self.solver = solver
         self.alpha_ = alpha_
@@ -163,11 +164,15 @@ class GP:
 
     def log_marginal_likelihood(self, hypers, eval_gradient=False):
         """
-        Compute log-marginal likelihood value and its derivative
 
-        :param eval_gradient:
-        :param hypers: hyper parameters
-        :return: loglik, dloglik
+        Parameters
+        ----------
+        hypers
+        eval_gradient
+
+        Returns
+        -------
+
         """
 
         self.kernel.theta = hypers
@@ -229,8 +234,6 @@ class GP:
             ax.spines[edge].set_linewidth(2.0)
         plt.plot(X_test, -self.acq_func(X_test, self.f_star))
         save_fig("acquisition" + "_" + str(len(self.X_train)))
-
-
 
     def plot_samples(self, nsamples, save_png=False):
         """
