@@ -16,7 +16,7 @@ class Acquisition(ABC):
 
 class ExpectedImprovement(Acquisition):
     
-    def __init__(self, model, bounds, xi=0.0):
+    def __init__(self, model, bounds, xi=0.1):
         super().__init__(model, bounds)
         self.xi = xi
 
@@ -38,15 +38,9 @@ class ExpectedImprovement(Acquisition):
 
         """
 
-        # get mean and standard deviation of point x
-        mu, sig = self.model.predict(x)
-
-        sig = np.diagonal(sig)
-
-        # helping value for simplicity
-        arg = (mu-f_star-self.xi)/sig
-
-        # expected improvement
-        EI = arg * sig * norm.cdf(arg) + sig * norm.cdf(arg)
+        mu, sig = self.model.predict(x)                         # mean and standard deviation of point x
+        sig = np.diagonal(sig)                                  # only diagonal entries needed
+        arg = (mu - f_star - self.xi) / sig                     # helping value for simplicity
+        EI = arg * sig * norm.cdf(arg) + sig * norm.cdf(arg)    # expected improvement
 
         return -EI

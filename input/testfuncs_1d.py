@@ -29,3 +29,7 @@ def exponential_growth(x):
 def sine_plus_linear(x):
     # Function 6: Combination of sine wave and linear function
     return np.sin(5 * x) + x
+
+def sin_tanh(x):
+    # Function 7: Combination of sin and tanh
+    return np.sin(5 * x) * (1 - np.tanh(x ** 2))

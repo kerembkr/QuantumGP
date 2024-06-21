@@ -208,11 +208,12 @@ class GP:
             The next point to evaluate.
         """
         self.f_star = np.min(self.y_train)  # Current best known function value
-        self.acq_func = ExpectedImprovement(model=self, bounds=[(min(self.X_train), max(self.X_train))])
+        self.acq_func = ExpectedImprovement(model=self,
+                                            xi=0.99,
+                                            bounds=[(min(self.X_train), max(self.X_train))])
 
         opt_res = scipy.optimize.minimize(
             self.acq_func,
-            # np.zeros(self.X_train.shape[1]),
             np.zeros(1),
             args=(self.f_star,),
             method="L-BFGS-B",
