@@ -5,6 +5,7 @@ from src.utils.utils import data_from_func
 from src.solver.solver import Solver
 from input.testfuncs_1d import oscillatory_increasing_amplitude
 from src.solver.classic.cg import CG
+from src.solver.classic.pcg import PCG
 
 # choose function
 func = oscillatory_increasing_amplitude
@@ -18,7 +19,7 @@ eps = 0.1
 
 # choose solver
 # solver = Solver()
-solver = CG()
+solver = PCG()
 
 # create GP model
 model = GP(kernel=kernel,

@@ -5,10 +5,10 @@ from src.utils.utils import timing
 
 class PCG(Solver):
 
-    def __init__(self, A, b, M=None, maxiter=20, tol=1e-8):
-        super().__init__(A, b)
+    def __init__(self, M=None, maxiter=20, tol=1e-8):
+        super().__init__()
         self.iters = None
-        self.M = M if M is not None else np.eye(A.shape[0])
+        self.M = M
         self.maxiter = maxiter
         self.tol = tol
 
@@ -17,6 +17,9 @@ class PCG(Solver):
         """
         Conjugate Gradient Method with Preconditioning
         """
+
+        if self.M is None:
+            self.M = np.eye(self.N)
 
         self.x = np.zeros(self.N)                                       # initial solution guess
         r = self.b - self.A @ self.x                                    # initial residual
