@@ -17,3 +17,4 @@ solver_basic.b = b
 solver_basic.A = A
 solver_basic.solve()
 
+# test
