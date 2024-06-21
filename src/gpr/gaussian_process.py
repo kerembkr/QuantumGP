@@ -8,6 +8,7 @@ from matplotlib.ticker import MaxNLocator
 from scipy.linalg import cholesky, solve_triangular
 from src.utils.acquisition import ExpectedImprovement
 
+
 class GP:
     def __init__(self, kernel, optimizer=None, alpha_=1e-10, n_restarts_optimizer=0, solver=None, precon=None,
                  acq_func=None):
@@ -209,7 +210,7 @@ class GP:
         """
         self.f_star = np.min(self.y_train)  # Current best known function value
         self.acq_func = ExpectedImprovement(model=self,
-                                            xi=0.99,
+                                            xi=0.01,
                                             bounds=[(min(self.X_train), max(self.X_train))])
 
         opt_res = scipy.optimize.minimize(
@@ -306,7 +307,6 @@ class GP:
         ax.imshow(P, extent=[xmin, xmax, ymin, ymax], aspect="auto", origin="lower", cmap="Purples", alpha=0.6)
 
         if post:
-            # save_fig("posterior")
             save_fig("posterior" + "_" + str(len(self.X_train)))
         else:
             save_fig("prior")
