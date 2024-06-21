@@ -221,6 +221,7 @@ class GP:
         fig, ax = plt.subplots(1, 1, figsize=(8, 6))
         ax.set_xlabel("$X$", fontsize=15)
         ax.set_ylabel("$EI$", fontsize=15)
+        ax.set_xlim([min(X_test), max(X_test)])
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
         ax.tick_params(direction="in", labelsize=15, length=10, width=0.8, colors='k')

@@ -10,7 +10,7 @@ from src.solver.classic.cholesky import Cholesky
 
 # choose function
 func = oscillatory_increasing_amplitude
-X_train, X_test, y_train = data_from_func(f=func, N=2, M=500, xx=[0.0, 4.0, -2.0, 6.0], noise=0.1)
+X_train, X_test, y_train = data_from_func(f=func, N=10, M=500, xx=[-2.0, 6.0, -2.0, 6.0], noise=0.1)
 
 # choose kernel
 kernel = RBFKernel(theta=[1.0, 1.0])
