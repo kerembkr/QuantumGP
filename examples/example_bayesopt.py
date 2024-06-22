@@ -9,13 +9,13 @@ np.random.seed(237)
 
 # choose function
 func = sin_tanh
-X_train, X_test, y_train = data_from_func(f=func, N=8, M=400, xx=[-2.0, 2.0, -2.0, 2.0], noise=0.1, rand=True)
+X_train, X_test, y_train = data_from_func(f=func, N=8, M=400, xx=[-2.0, 2.0, -2.0, 2.0], noise=0.01, rand=True)
 
 # choose kernel
 kernel = RBFKernel(theta=[1.0, 1.0])
 
 # noise
-eps = 0.1
+eps = 0.01
 
 # choose solver
 solver = Cholesky()
@@ -29,7 +29,7 @@ acq_func = "EI"
 # create GP model
 model = GP(kernel=kernel,
            optimizer="fmin_l_bfgs_b",
-           alpha_=eps ** 2,
+           alpha_=eps**2,
            n_restarts_optimizer=5,
            solver=solver,
            precon=precon,

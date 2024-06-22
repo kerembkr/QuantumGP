@@ -210,12 +210,12 @@ class GP:
         """
 
         self.f_star = np.min(self.y_train)  # Current best known function value
-        # self.f_star = np.max(self.y_train)  # Current best known function value
 
         self.acq_func = ExpectedImprovement(model=self,
-                                            xi=0.01,
+                                            xi=0.1,  # exploration exploitation trade-off
                                             bounds=[(min(self.X_train), max(self.X_train))])
 
+        # maximize acquisition function = minimize negative acquisition function
         opt_res = scipy.optimize.minimize(
             self.acq_func,
             np.zeros(1),
@@ -297,10 +297,12 @@ class GP:
         for edge in ["top", "bottom", "left", "right"]:
             ax1.spines[edge].set_linewidth(2.0)
         ax1.plot(X, mu, color="purple", lw=2)
-        for i, sample in enumerate(samples):
-            ax1.plot(X, sample, lw=0.5, ls='-', color="purple")
+        # for i, sample in enumerate(samples):
+        #     ax1.plot(X, sample, lw=0.5, ls='-', color="purple")
         if post:
             ax1.scatter(self.X_train, self.y_train, color='k', linestyle='None', linewidth=1.0)
+        if plot_acq:
+            ax1.scatter(self.X_train[-1], self.y_train[-1], color='yellow', linestyle='None', linewidth=1.0)
         stdpi = np.sqrt(np.diag(cov))[:, np.newaxis]
         yy = np.linspace(ymin, ymax, len(X)).reshape([len(X), 1])
         P = np.exp(-0.5 * (yy - mu.T) ** 2 / (stdpi ** 2).T)
