@@ -6,7 +6,8 @@ from src.utils.ansatz import *
 from src.utils.embedding import *
 from src.optimizers.optim_qml import *
 from src.utils.backend import DefaultQubit, LightningQubit
-from src.utils.utils import get_paulis, plot_costs, get_random_ls
+from src.utils.utils import get_paulis, get_random_ls
+from src.utils.plotting import plot_costs
 
 
 class FastSlowVQLS:
@@ -30,22 +31,20 @@ class FastSlowVQLS:
 
     def opt(self, optimizer=None, ansatz=None, stateprep=None, backend=None, epochs=100, epochs_bo=None, tol=1e-4):
         """
-        Minimize the cost function using a Variational Quantum Circuit.
 
-        :param stateprep: State Preparation of the quantum state |b>
-        :param optimizer: Optimizer instance (default: GradientDescentQML). Examples: GradientDescent, Adam.
-        :param ansatz: Variational circuit ansatz instance (default: StrongEntangling with 1 layer).
-        :param epochs: Max steps for local optimization (default: 100).
-        :param epochs_bo: Max steps for Bayesian optimization (default: None).
-        :param tol: Convergence tolerance (default: 1e-4).
+        Parameters
+        ----------
+        optimizer
+        ansatz
+        stateprep
+        backend
+        epochs
+        epochs_bo
+        tol
 
-        :return: Tuple (w, cost_vals):
-                 - w: Optimized weights of the quantum circuit.
-                 - cost_vals: List of cost function values during optimization.
+        Returns
+        -------
 
-        Example:
-        --------
-        w, cost_vals = opt(optimizer=AdamOptimizer(), ansatz=HardwareEfficient(), epochs=200, tol=1e-6)
         """
 
         if optimizer is None:
@@ -64,7 +63,7 @@ class FastSlowVQLS:
             self.stateprep = stateprep
 
         if backend is None:
-            self.backend = DefaultQubit(wires=self.nqubits+1)
+            self.backend = DefaultQubit(wires=self.nqubits + 1)
         else:
             self.backend = backend
 
@@ -279,7 +278,7 @@ class FastSlowVQLS:
 
         Notes:
         ------
-        - This method calculates the cost function by evaluating the quantum nodes for both the real and imaginary parts.
+        - This method calculates the cost function by evaluating the quantum nodes for both the real and imaginary parts
         - It iterates over the quantum layers and qubits to compute the norm of the encoded state (psi_norm) and the
           expectation value of the problem matrix (mu_sum).
         - The cost function is then calculated as 0.5 - 0.5 * abs(mu_sum) / (nqubits * abs(psi_norm)).

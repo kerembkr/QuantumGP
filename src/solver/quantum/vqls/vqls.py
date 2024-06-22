@@ -9,7 +9,7 @@ from src.utils.backend import DefaultQubit
 from src.utils.utils import get_paulis
 
 
-class FastSlowVQLS:
+class VQLS:
     def __init__(self, A, b):
 
         # linear system
