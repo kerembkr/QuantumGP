@@ -227,26 +227,6 @@ class GP:
 
         return opt_res.x
 
-    def plot_acquisition(self, X_test):
-
-        self.f_star = np.min(self.y_train)  # Current best known function value
-
-        self.acq_func = ExpectedImprovement(model=self,
-                                            xi=0.01,
-                                            bounds=[(min(self.X_train), max(self.X_train))])
-
-        fig, ax = plt.subplots(1, 1, figsize=(8, 6))
-        ax.set_xlabel("$X$", fontsize=15)
-        ax.set_ylabel("$EI$", fontsize=15)
-        ax.set_xlim([min(X_test), max(X_test)])
-        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-        ax.tick_params(direction="in", labelsize=15, length=10, width=0.8, colors='k')
-        for edge in ["top", "bottom", "left", "right"]:
-            ax.spines[edge].set_linewidth(2.0)
-        plt.plot(X_test, -self.acq_func(X_test, self.f_star))
-        save_fig("acquisition" + "_" + str(len(self.X_train)))
-
     def plot_samples(self, nsamples, save_png=False):
         """
         Plot samples with GP Model
@@ -287,7 +267,7 @@ class GP:
         if save_png:
             save_fig("samples")
 
-    def plot_both(self, X, mu, cov, post=False, plot_acq=True):
+    def plot_gp(self, X, mu, cov, post=False, plot_acq=True):
         # Create a figure
         if plot_acq:
             fig = plt.figure(figsize=(12, 5))
@@ -350,38 +330,3 @@ class GP:
             save_fig("gp" + "_" + str(len(self.X_train)))
         else:
             save_fig("gp_0")
-
-
-    def plot_gp(self, X, mu, cov, post=False):
-        delta = 1.96
-        if post is True:
-            delta = (max(mu) - min(mu)) / 10
-        xmin = min(X)
-        xmax = max(X)
-        ymin = min(mu) - delta
-        ymax = max(mu) + delta
-        X = X.ravel()
-        mu = mu.ravel()
-        samples = np.random.multivariate_normal(mu, cov, 10)
-        fig, ax = plt.subplots(1, 1, figsize=(8, 6))
-        ax.set_xlabel("$X$", fontsize=15)
-        ax.set_ylabel("$y$", fontsize=15)
-        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-        ax.tick_params(direction="in", labelsize=15, length=10, width=0.8, colors='k')
-        for edge in ["top", "bottom", "left", "right"]:
-            ax.spines[edge].set_linewidth(2.0)
-        plt.plot(X, mu, color="purple", lw=2)
-        for i, sample in enumerate(samples):
-            plt.plot(X, sample, lw=0.5, ls='-', color="purple")
-        if post:
-            plt.scatter(self.X_train, self.y_train, color='k', linestyle='None', linewidth=1.0)
-        stdpi = np.sqrt(np.diag(cov))[:, np.newaxis]
-        yy = np.linspace(ymin, ymax, len(X)).reshape([len(X), 1])
-        P = np.exp(-0.5 * (yy - mu.T) ** 2 / (stdpi ** 2).T)
-        ax.imshow(P, extent=[xmin, xmax, ymin, ymax], aspect="auto", origin="lower", cmap="Purples", alpha=0.6)
-
-        if post:
-            save_fig("posterior" + "_" + str(len(self.X_train)))
-        else:
-            save_fig("prior")

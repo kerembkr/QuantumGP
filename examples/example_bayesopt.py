@@ -42,7 +42,7 @@ model.fit(X_train, y_train)
 y_mean, y_cov = model.predict(X_test)
 
 # plot posterior
-model.plot_both(X=X_test, mu=y_mean, cov=y_cov, post=True, plot_acq=True)
+model.plot_gp(X=X_test, mu=y_mean, cov=y_cov, post=True, plot_acq=True)
 
 # Bayesian Optimization
 for i in range(5):
@@ -52,4 +52,4 @@ for i in range(5):
     y_train = np.append(y_train, y_next, axis=0)                # add new y to y_train
     model.fit(X_train, y_train)                                 # fit
     y_mean, y_cov = model.predict(X_test)                       # predict
-    model.plot_both(X=X_test, mu=y_mean, cov=y_cov, post=True, plot_acq=True)
+    model.plot_gp(X=X_test, mu=y_mean, cov=y_cov, post=True, plot_acq=True)
