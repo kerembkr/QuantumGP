@@ -62,7 +62,5 @@ class TestSolvers(unittest.TestCase):
         np.allclose(x, solver.xprobs, atol=1e-8)
 
 
-
-
 if __name__ == '__main__':
     unittest.main()

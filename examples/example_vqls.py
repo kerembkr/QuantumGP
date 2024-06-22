@@ -10,16 +10,17 @@ from src.utils.plotting import plot_costs
 np.random.seed(42)
 
 # number of qubits & layers
-nqubits = 2
-nlayers = 3
+nqubits = 1
+nlayers = 1
 
-maxiter = 200
-
-# random symmetric positive definite matrix
-A0, b0 = get_random_ls(nqubits, easy_example=True)
+maxiter = 10
 
 # init
-solver = VQLS(A=A0, b=b0)
+solver = VQLS()
+
+# set linear system
+A0, b0 = get_random_ls(nqubits, easy_example=True)  # random spd
+solver.set_lse(A=A0, b=b0)
 
 # choose optimizer
 optims = [GradientDescentQML(),
@@ -50,7 +51,7 @@ for optim in optims:
 
     wopts[optim.name] = wopt
 
-title = "VQLS {:s}    qubits = {:d}    layers = {:d}".format(ansatz_.__class__.__name__, nqubits, nlayers)
+title = "VQLS   {:s}    qubits = {:d}    layers = {:d}".format(ansatz_.__class__.__name__, nqubits, nlayers)
 plot_costs(data=cost_hists, save_png=True, title=title, fname="loss_vqls")
 
 device_probs = LightningQubit(wires=nqubits, shots=10000)

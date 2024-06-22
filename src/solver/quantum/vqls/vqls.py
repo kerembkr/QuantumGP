@@ -1,5 +1,4 @@
 import src.utils.utils as utils
-from skopt import gp_minimize
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from src.utils.ansatz import *
@@ -10,9 +9,19 @@ from src.utils.utils import get_paulis
 
 
 class VQLS:
-    def __init__(self, A, b):
+    def __init__(self):
+        self.c = None
+        self.wires = None
+        self.mats = None
+        self.nqubits = None
+        self.b = None
+        self.A = None
+        self.optimizer = None
+        self.stateprep = None
+        self.ansatz = None
+        self.backend = None
 
-        # linear system
+    def set_lse(self, A, b):
         self.A = A
         self.b = b
 
@@ -21,12 +30,6 @@ class VQLS:
 
         # Pauli decomposition
         self.mats, self.wires, self.c = get_paulis(self.A)
-
-        # quantum circuit
-        self.optimizer = None
-        self.stateprep = None
-        self.ansatz = None
-        self.backend = None
 
     def opt(self, optimizer=None, ansatz=None, stateprep=None, backend=None, epochs=100, tol=1e-4):
         """
