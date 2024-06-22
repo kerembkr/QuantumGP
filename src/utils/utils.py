@@ -20,14 +20,19 @@ def timing(f):
 
 def data_from_func(f, N, M, xx, noise=0.1, rand=False):
     """
-    Create N training and M testing data samples from input function
 
-    :param noise: noise in data
-    :param f: test function
-    :param N: number of training data samples
-    :param M: number of testing data samples
-    :param xx: training space and testing space [xmin_train, xmax_train, xmin_test, xmax_test]
-    :return: training and testing data
+    Parameters
+    ----------
+    f
+    N
+    M
+    xx
+    noise
+    rand
+
+    Returns
+    -------
+
     """
 
     # set sample space
@@ -47,7 +52,7 @@ def data_from_func(f, N, M, xx, noise=0.1, rand=False):
 
 
 def save_fig(name):
-    output_dir = '../output/'
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    output_dir = '/Users/kerembuekrue/Documents/code/QuantumGP/output/'
+    # if not os.path.exists(output_dir):
+    #     os.makedirs(output_dir)
     plt.savefig(os.path.join(output_dir, name + ".png"))

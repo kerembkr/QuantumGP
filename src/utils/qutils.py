@@ -3,7 +3,7 @@ import pennylane.numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import os
-
+from src.utils.utils import save_fig
 
 def get_paulis(mat):
     """
@@ -79,11 +79,11 @@ def plot_costs(data, save_png=False, title=None, log=False):
         save_fig("curves")
 
 
-def save_fig(name):
-    output_dir = '../output/'
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    plt.savefig(os.path.join(output_dir, name + ".png"))
+# def save_fig(name):
+#     output_dir = '../output/'
+#     if not os.path.exists(output_dir):
+#         os.makedirs(output_dir)
+#     plt.savefig(os.path.join(output_dir, name + ".png"))
 
 
 def combine_lists(cost_history):
