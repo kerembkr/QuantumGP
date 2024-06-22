@@ -1,5 +1,6 @@
-from src.utils.utils import save_fig
 import matplotlib.pyplot as plt
+from src.utils.utils import save_fig
+from matplotlib.ticker import MaxNLocator
 
 
 def plot_fast_slow(cost_history, epochs, epochs_bo, opt_name, iters):

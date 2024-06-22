@@ -6,7 +6,7 @@ from src.utils.ansatz import *
 from src.utils.embedding import *
 from src.optimizers.optim_qml import *
 from src.utils.backend import DefaultQubit, LightningQubit
-from src.utils.qutils import get_paulis, plot_costs, get_random_ls
+from src.utils.utils import get_paulis, plot_costs, get_random_ls
 
 
 class FastSlowVQLS:
