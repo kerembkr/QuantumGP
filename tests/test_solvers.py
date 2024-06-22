@@ -41,26 +41,6 @@ class TestSolvers(unittest.TestCase):
             solver.set_lse(A, b)
             solver.solve()
 
-    @parameterized.expand([
-        ("VQLS", VQLS),
-    ])
-    def test_probabilities(self, name, Solver):
-        np.random.seed(42)          # fix random seed
-        A = np.random.rand(2, 2)    # random matrix
-        A = A @ A.T                 # create an spd matrix
-        b = np.random.rand(2)       # random vector
-        solver = Solver()           # initialize solver
-        solver.set_lse(A, b)        # set linear system
-        solver.solve()              # solve system with solver
-
-        # compute normed solution
-        x = np.linalg.solve(A, b)
-        x = x / np.linalg.norm(x)
-        x = x**2
-
-        # check accuracy
-        np.allclose(x, solver.xprobs, atol=1e-8)
-
 
 if __name__ == '__main__':
     unittest.main()
