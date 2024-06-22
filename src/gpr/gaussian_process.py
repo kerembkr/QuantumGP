@@ -209,8 +209,8 @@ class GP:
             The next point to evaluate.
         """
 
-        # self.f_star = np.min(self.y_train)  # Current best known function value
-        self.f_star = np.max(self.y_train)  # Current best known function value
+        self.f_star = np.min(self.y_train)  # Current best known function value
+        # self.f_star = np.max(self.y_train)  # Current best known function value
 
         self.acq_func = ExpectedImprovement(model=self,
                                             xi=0.01,

@@ -15,7 +15,7 @@ X_train, X_test, y_train = data_from_func(f=func, N=8, M=400, xx=[-2.0, 2.0, -2.
 kernel = RBFKernel(theta=[1.0, 1.0])
 
 # noise
-eps = 0.01
+eps = 0.1
 
 # choose solver
 solver = Cholesky()
@@ -45,7 +45,7 @@ y_mean, y_cov = model.predict(X_test)
 model.plot_both(X=X_test, mu=y_mean, cov=y_cov, post=True, plot_acq=True)
 
 # Bayesian Optimization
-for i in range(1):
+for i in range(5):
     x_next = model.select_next_point()                          # minimize acquisition function
     y_next = func(x_next)                                       # compute new y
     X_train = np.append(X_train, x_next, axis=0)                # add new x to X_train
