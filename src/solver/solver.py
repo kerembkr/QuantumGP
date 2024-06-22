@@ -1,6 +1,7 @@
 import numpy as np
 from src.utils.utils import timing
 
+
 class Solver:
 
     def __init__(self):

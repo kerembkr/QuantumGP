@@ -6,10 +6,14 @@ from src.utils.embedding import *
 from src.optimizers.optim_qml import *
 from src.utils.backend import DefaultQubit
 from src.utils.utils import get_paulis
+from src.solver.solver import Solver
 
 
-class VQLS:
+class VQLS(Solver):
     def __init__(self):
+        super().__init__()
+        self.tol = None
+        self.epochs = None
         self.c = None
         self.wires = None
         self.mats = None
@@ -20,6 +24,22 @@ class VQLS:
         self.stateprep = None
         self.ansatz = None
         self.backend = None
+
+    def solve(self):
+
+        wopt, loss_hist = self.opt(optimizer=self.optimizer,
+                                   ansatz=self.ansatz,
+                                   stateprep=self.stateprep,
+                                   backend=self.backend,
+                                   epochs=self.epochs,
+                                   tol=self.tol)
+
+        @qml.qnode(qml.device("default.qubit", wires=self.nqubits))
+        def prepare_and_sample(weights):
+            self.V(weights)
+            return qml.state()
+
+        self.x = prepare_and_sample(wopt)
 
     def set_lse(self, A, b):
         self.A = A
@@ -48,6 +68,9 @@ class VQLS:
 
         """
 
+        self.epochs = epochs
+        self.tol = tol
+
         if optimizer is None:
             self.optimizer = GradientDescentQML()
         else:
@@ -64,7 +87,7 @@ class VQLS:
             self.stateprep = stateprep
 
         if backend is None:
-            self.backend = DefaultQubit(wires=self.nqubits+1)
+            self.backend = DefaultQubit(wires=self.nqubits + 1)
         else:
             self.backend = backend
 

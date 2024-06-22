@@ -13,7 +13,7 @@ np.random.seed(42)
 nqubits = 1
 nlayers = 1
 
-maxiter = 10
+maxiter = 20
 
 # init
 solver = VQLS()
@@ -40,6 +40,7 @@ cost_hists = {}
 wopts = {}
 
 for optim in optims:
+
     wopt, cost_hist = solver.opt(optimizer=optim,
                                  ansatz=ansatz_,
                                  stateprep=prep_,
