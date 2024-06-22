@@ -30,7 +30,7 @@ def plot_fast_slow(cost_history, epochs, epochs_bo, opt_name, iters):
     save_fig(opt_name + '.png')
 
 
-def plot_costs(data, save_png=False, title=None, log=False):
+def plot_costs(data, save_png=False, title=None, log=False, fname=None):
     # plot curves
     fig, ax = plt.subplots(1, 1, figsize=(10, 6))
     for label, cost in data.items():
@@ -53,4 +53,4 @@ def plot_costs(data, save_png=False, title=None, log=False):
         ax.set_title(title, fontsize=18, fontname='serif')
 
     if save_png:
-        save_fig("curves")
+        save_fig(fname)

@@ -28,24 +28,21 @@ class VQLS:
         self.ansatz = None
         self.backend = None
 
-    def opt(self, optimizer=None, ansatz=None, stateprep=None, backend=None, epochs=100, epochs_bo=None, tol=1e-4):
+    def opt(self, optimizer=None, ansatz=None, stateprep=None, backend=None, epochs=100, tol=1e-4):
         """
-        Minimize the cost function using a Variational Quantum Circuit.
 
-        :param stateprep: State Preparation of the quantum state |b>
-        :param optimizer: Optimizer instance (default: GradientDescentQML). Examples: GradientDescent, Adam.
-        :param ansatz: Variational circuit ansatz instance (default: StrongEntangling with 1 layer).
-        :param epochs: Max steps for local optimization (default: 100).
-        :param epochs_bo: Max steps for Bayesian optimization (default: None).
-        :param tol: Convergence tolerance (default: 1e-4).
+        Parameters
+        ----------
+        optimizer
+        ansatz
+        stateprep
+        backend
+        epochs
+        tol
 
-        :return: Tuple (w, cost_vals):
-                 - w: Optimized weights of the quantum circuit.
-                 - cost_vals: List of cost function values during optimization.
+        Returns
+        -------
 
-        Example:
-        --------
-        w, cost_vals = opt(optimizer=AdamOptimizer(), ansatz=HardwareEfficient(), epochs=200, tol=1e-6)
         """
 
         if optimizer is None:
@@ -70,10 +67,6 @@ class VQLS:
 
         # initial weights
         w = self.ansatz.init_weights()
-
-        # global optimization
-        if epochs_bo is not None:
-            w, _ = self.bayesopt_init(epochs_bo=epochs_bo)
 
         # local optimization
         w, cost_vals, iters = self.optimizer.optimize(func=self.cost, w=w, epochs=epochs, tol=tol)
@@ -140,52 +133,6 @@ class VQLS:
             return qml.expval(qml.PauliZ(wires=self.nqubits))
 
         return qcircuit
-
-    def bayesopt_init(self, epochs_bo=10):
-        """
-        Perform Bayesian Optimization to initialize the weights of the variational quantum circuit.
-
-        :param epochs_bo: Number of Bayesian optimization steps (default: 10).
-
-        :return: Tuple (w, cost_hist_bo):
-                 - w: Initial weights for the gradient-based optimizer.
-                 - cost_hist_bo: List of cost function values during Bayesian optimization.
-
-        Example:
-        --------
-        w, cost_hist_bo = bayesopt_init(epochs_bo=20)
-
-        Notes:
-        ------
-        - This method uses Bayesian optimization to find an initial set of weights that minimize the cost function.
-        - The optimization progress is printed at each step.
-
-        """
-
-        def print_progress(res_):
-            print("{:20s}    Step {:3d}    obj = {:9.7f} ".format(
-                "Bayesian Optimization", len(res_.func_vals), res_.func_vals[-1]))
-
-        # set parameter space
-        dimensions = [(-np.pi, +np.pi) for _ in range(self.ansatz.nweights)]
-
-        # bayesian optimization
-        res = gp_minimize(func=self.cost,
-                          dimensions=dimensions,
-                          callback=[print_progress],
-                          acq_func="EI",
-                          n_calls=epochs_bo)
-
-        # save cost function values
-        cost_hist_bo = res.func_vals.tolist()
-
-        # initial guess for gradient optimizer
-        w = np.tensor(res.x, requires_grad=True)
-
-        # reshape weights
-        w = self.ansatz.prep_weights(w)
-
-        return w, cost_hist_bo
 
     def U_b(self, vec):
         """

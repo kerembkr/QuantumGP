@@ -3,7 +3,7 @@ from src.utils.embedding import *
 from src.optimizers.optim_qml import *
 from src.utils.backend import DefaultQubit, LightningQubit
 from src.utils.utils import get_random_ls
-from src.solver.quantum.vqls.vqls import VQLS
+from src.solver.quantum.vqls.vqls_fast_and_slow import FastSlowVQLS
 from src.utils.plotting import plot_costs
 
 # reproducibility
@@ -19,7 +19,7 @@ maxiter = 20
 A0, b0 = get_random_ls(nqubits, easy_example=True)
 
 # init
-solver = VQLS(A=A0, b=b0)
+solver = FastSlowVQLS(A=A0, b=b0)
 
 # choose optimizer
 optims = [GradientDescentQML(),
@@ -44,14 +44,15 @@ for optim in optims:
                                  stateprep=prep_,
                                  backend=backend_,
                                  epochs=maxiter,
+                                 epochs_bo=None,
                                  tol=1e-6)
 
     cost_hists[optim.name] = cost_hist
 
     wopts[optim.name] = wopt
 
-title = "VQLS {:s}    qubits = {:d}    layers = {:d}".format(ansatz_.__class__.__name__, nqubits, nlayers)
-plot_costs(data=cost_hists, save_png=True, title=title, fname="loss_vqls")
+title = "FastSlowVQLS {:s}    qubits = {:d}    layers = {:d}".format(ansatz_.__class__.__name__, nqubits, nlayers)
+plot_costs(data=cost_hists, save_png=True, title=title, fname="loss_vqls_fastslow")
 
 device_probs = LightningQubit(wires=nqubits, shots=10000)
 

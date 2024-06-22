@@ -3,6 +3,7 @@ import numpy as np
 from time import time
 from functools import wraps
 import matplotlib.pyplot as plt
+import pennylane as qml
 
 
 def timing(f):
@@ -56,7 +57,6 @@ def save_fig(name):
     # if not os.path.exists(output_dir):
     #     os.makedirs(output_dir)
     plt.savefig(os.path.join(output_dir, name + ".png"))
-
 
 
 def get_paulis(mat):
@@ -113,4 +113,3 @@ def combine_lists(cost_history):
                     (sublist if isinstance(sublist, list) else [sublist])]
 
     return cost_history
-
