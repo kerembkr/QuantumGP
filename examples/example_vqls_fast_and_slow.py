@@ -10,10 +10,10 @@ from src.utils.plotting import plot_costs
 np.random.seed(42)
 
 # number of qubits & layers
-nqubits = 1
-nlayers = 1
+nqubits = 2
+nlayers = 3
 
-maxiter = 20
+maxiter = 200
 
 # random symmetric positive definite matrix
 A0, b0 = get_random_ls(nqubits, easy_example=True)
@@ -44,7 +44,7 @@ for optim in optims:
                                  stateprep=prep_,
                                  backend=backend_,
                                  epochs=maxiter,
-                                 epochs_bo=None,
+                                 epochs_bo=20,
                                  tol=1e-6)
 
     cost_hists[optim.name] = cost_hist
