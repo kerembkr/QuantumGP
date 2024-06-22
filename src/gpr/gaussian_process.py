@@ -68,7 +68,7 @@ class GP:
         self.L = cholesky(K_, lower=True, check_finite=False)
 
         #  alpha = L^T \ (L \ y)
-        #self.alpha = cho_solve((self.L, True), self.y_train, check_finite=False)
+        # self.alpha = cho_solve((self.L, True), self.y_train, check_finite=False)
 
         return self
 
@@ -259,15 +259,15 @@ class GP:
         plt.plot(X_train_sorted, y_train_sorted, ".-", label="Training Data")
         plt.plot(X_train_sorted, prior_samples + noise * randn(n, nsamples), ".-", alpha=0.3)
         # plt.plot(X_train_sorted, prior_samples + self.alpha_ * randn(n, nsamples), ".-")
-        delta = (max(self.y_train)-min(self.y_train))/5.0
-        ax.set_ylim([min(self.y_train)-delta, max(self.y_train)+delta])
+        delta = (max(self.y_train) - min(self.y_train)) / 5.0
+        ax.set_ylim([min(self.y_train) - delta, max(self.y_train) + delta])
 
         plt.legend()
         # save sample plots
         if save_png:
             save_fig("samples")
 
-    def plot_gp(self, X, mu, cov, post=False, plot_acq=True):
+    def plot_gp(self, X, mu, cov, post=False, plot_acq=False):
         # Create a figure
         if plot_acq:
             fig = plt.figure(figsize=(12, 5))
@@ -311,8 +311,8 @@ class GP:
 
             self.f_star = np.min(self.y_train)  # Current best known function value
             self.acq_func = ExpectedImprovement(model=self,
-                                                     xi=0.01,
-                                                     bounds=[(min(self.X_train), max(self.X_train))])
+                                                xi=0.01,
+                                                bounds=[(min(self.X_train), max(self.X_train))])
 
             ax2.set_xlabel("$X$", fontsize=15)
             ax2.set_ylabel("$EI$", fontsize=15)
