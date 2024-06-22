@@ -1,11 +1,12 @@
 import numpy as np
 from src.solver.solver import Solver
 from src.utils.utils import timing
-
+from src.utils.assertions import (assert_not_none, assert_symmetric, assert_square, assert_not_singular,
+                                  assert_positive_definite)
 
 class PCG(Solver):
 
-    def __init__(self, M=None, maxiter=20, tol=1e-8):
+    def __init__(self, M=None, maxiter=None, tol=1e-8):
         super().__init__()
         self.iters = None
         self.M = M
@@ -17,6 +18,16 @@ class PCG(Solver):
         """
         Conjugate Gradient Method with Preconditioning
         """
+
+        assert_not_none(self.A, "Matrix A must be set before solving.")
+        assert_not_none(self.b, "Vector b must be set before solving.")
+        # assert_symmetric(self.A)
+        assert_square(self.A)
+        assert_not_singular(self.A)
+        # assert_positive_definite(self.A)
+
+        if self.maxiter is None:
+            self.maxiter = 10 * self.N
 
         if self.M is None:
             self.M = np.eye(self.N)

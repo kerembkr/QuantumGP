@@ -1,14 +1,15 @@
 import numpy as np
 from src.utils.utils import timing
 from src.solver.solver import Solver
-
+from src.utils.assertions import (assert_not_none, assert_symmetric, assert_square, assert_not_singular,
+                                  assert_positive_definite)
 
 class CG(Solver):
 
-    def __init__(self, maxiter=20, tol=1e-8):
+    def __init__(self, maxiter=None, tol=1e-8):
         super().__init__()
         self.iters: int = 0
-        self.maxiter: int = maxiter
+        self.maxiter = maxiter
         self.tol: float = tol
 
     @timing
@@ -16,8 +17,16 @@ class CG(Solver):
         """
         Conjugate Gradient Method
         """
-        if self.A is None or self.b is None:
-            raise ValueError("Matrix A and vector b must be set before solving.")
+
+        assert_not_none(self.A, "Matrix A must be set before solving.")
+        assert_not_none(self.b, "Vector b must be set before solving.")
+        # assert_symmetric(self.A)
+        assert_square(self.A)
+        assert_not_singular(self.A)
+        # assert_positive_definite(self.A)
+
+        if self.maxiter is None:
+            self.maxiter = 10 * self.N
 
         self.x = np.zeros(self.N)  # initial solution guess
         r = self.b - self.A @ self.x  # initial residual

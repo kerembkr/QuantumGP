@@ -2,6 +2,8 @@ import numpy as np
 from src.utils.utils import timing
 from src.solver.solver import Solver
 from src.linalg.decomposition.chol import cholesky_decompose
+from src.utils.assertions import (assert_not_none, assert_symmetric, assert_square, assert_not_singular,
+                                  assert_positive_definite)
 
 
 class Cholesky(Solver):
@@ -15,8 +17,13 @@ class Cholesky(Solver):
         """
         Cholesky Solver
         """
-        if self.A is None or self.b is None:
-            raise ValueError("Matrix A and vector b must be set before solving.")
+
+        assert_not_none(self.A, "Matrix A must be set before solving.")
+        assert_not_none(self.b, "Vector b must be set before solving.")
+        assert_symmetric(self.A)
+        assert_square(self.A)
+        assert_not_singular(self.A)
+        assert_positive_definite(self.A)
 
         self.L = cholesky_decompose(self.A)     # decompose
         self.x = self.cholesky_solve()          # solve
