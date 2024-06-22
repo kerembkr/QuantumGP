@@ -208,7 +208,10 @@ class GP:
         array_like
             The next point to evaluate.
         """
-        self.f_star = np.min(self.y_train)  # Current best known function value
+
+        # self.f_star = np.min(self.y_train)  # Current best known function value
+        self.f_star = np.max(self.y_train)  # Current best known function value
+
         self.acq_func = ExpectedImprovement(model=self,
                                             xi=0.01,
                                             bounds=[(min(self.X_train), max(self.X_train))])
@@ -225,6 +228,13 @@ class GP:
         return opt_res.x
 
     def plot_acquisition(self, X_test):
+
+        self.f_star = np.min(self.y_train)  # Current best known function value
+
+        self.acq_func = ExpectedImprovement(model=self,
+                                            xi=0.01,
+                                            bounds=[(min(self.X_train), max(self.X_train))])
+
         fig, ax = plt.subplots(1, 1, figsize=(8, 6))
         ax.set_xlabel("$X$", fontsize=15)
         ax.set_ylabel("$EI$", fontsize=15)
@@ -276,6 +286,71 @@ class GP:
         # save sample plots
         if save_png:
             save_fig("samples")
+
+    def plot_both(self, X, mu, cov, post=False, plot_acq=True):
+        # Create a figure
+        if plot_acq:
+            fig = plt.figure(figsize=(12, 5))
+            ax1 = fig.add_subplot(121)
+            ax2 = fig.add_subplot(122)
+        else:
+            fig = plt.figure(figsize=(6, 5))
+            ax1 = fig.add_subplot(111)
+
+        # Always plot the posterior
+        delta = 1.96
+        if post:
+            delta = (max(mu) - min(mu)) / 10
+        xmin = min(X)
+        xmax = max(X)
+        ymin = min(mu) - delta
+        ymax = max(mu) + delta
+        X = X.ravel()
+        mu = mu.ravel()
+        samples = np.random.multivariate_normal(mu, cov, 10)
+
+        ax1.set_xlabel("$X$", fontsize=15)
+        ax1.set_ylabel("$y$", fontsize=15)
+        ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax1.yaxis.set_major_locator(MaxNLocator(integer=True))
+        ax1.tick_params(direction="in", labelsize=15, length=10, width=0.8, colors='k')
+        for edge in ["top", "bottom", "left", "right"]:
+            ax1.spines[edge].set_linewidth(2.0)
+        ax1.plot(X, mu, color="purple", lw=2)
+        for i, sample in enumerate(samples):
+            ax1.plot(X, sample, lw=0.5, ls='-', color="purple")
+        if post:
+            ax1.scatter(self.X_train, self.y_train, color='k', linestyle='None', linewidth=1.0)
+        stdpi = np.sqrt(np.diag(cov))[:, np.newaxis]
+        yy = np.linspace(ymin, ymax, len(X)).reshape([len(X), 1])
+        P = np.exp(-0.5 * (yy - mu.T) ** 2 / (stdpi ** 2).T)
+        ax1.imshow(P, extent=[xmin, xmax, ymin, ymax], aspect="auto", origin="lower", cmap="Purples", alpha=0.6)
+
+        # Plot acquisition function if plot_acq is True
+        if plot_acq:
+
+            self.f_star = np.min(self.y_train)  # Current best known function value
+            self.acq_func = ExpectedImprovement(model=self,
+                                                     xi=0.01,
+                                                     bounds=[(min(self.X_train), max(self.X_train))])
+
+            ax2.set_xlabel("$X$", fontsize=15)
+            ax2.set_ylabel("$EI$", fontsize=15)
+            ax2.set_xlim([min(X), max(X)])
+            ax2.xaxis.set_major_locator(MaxNLocator(integer=True))
+            ax2.yaxis.set_major_locator(MaxNLocator(integer=True))
+            ax2.tick_params(direction="in", labelsize=15, length=10, width=0.8, colors='k')
+            for edge in ["top", "bottom", "left", "right"]:
+                ax2.spines[edge].set_linewidth(2.0)
+            ax2.plot(X, -self.acq_func(X, self.f_star))
+
+        plt.tight_layout()
+
+        if post:
+            save_fig("gp" + "_" + str(len(self.X_train)))
+        else:
+            save_fig("gp_0")
+
 
     def plot_gp(self, X, mu, cov, post=False):
         delta = 1.96

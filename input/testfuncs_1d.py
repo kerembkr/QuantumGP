@@ -1,5 +1,5 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 def oscillatory_increasing_amplitude(x):
     # Function 1: Oscillatory function with increasing amplitude
@@ -33,3 +33,10 @@ def sine_plus_linear(x):
 def sin_tanh(x):
     # Function 7: Combination of sin and tanh
     return np.sin(5 * x) * (1 - np.tanh(x ** 2))
+
+
+if __name__ == "__main__":
+    x = np.linspace(-2.0, 2.0, 400)
+    plt.figure()
+    plt.plot(x, sin_tanh(x))
+    plt.show()
