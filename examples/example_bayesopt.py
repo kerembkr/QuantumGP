@@ -37,7 +37,7 @@ model = GP(kernel=kernel,
            func=func)
 
 # Bayesian Optimization
-for i in range(1):
+for i in range(3):
     model.fit(X_train, y_train)                                                 # fit
     y_mean, y_cov = model.predict(X_test)                                       # predict
     model.plot_gp(X=X_test, mu=y_mean, cov=y_cov, post=True, plot_acq=True)     # plot

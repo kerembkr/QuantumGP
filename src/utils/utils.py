@@ -54,8 +54,8 @@ def data_from_func(f, N, M, xx, noise=0.1, rand=False):
 
 def save_fig(name):
     output_dir = '/Users/kerembuekrue/Documents/code/QuantumGP/output/'
-    # if not os.path.exists(output_dir):
-    #     os.makedirs(output_dir)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
     plt.savefig(os.path.join(output_dir, name + ".png"))
 
 

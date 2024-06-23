@@ -320,7 +320,8 @@ class GP:
             ax2.set_xlim([min(X), max(X)])
             for edge in ["top", "bottom", "left", "right"]:
                 ax2.spines[edge].set_linewidth(2.0)
-            ax2.plot(X, -self.acq_func(X, self.f_star))
+            ax2.plot(X, -self.acq_func(X, self.f_star), lw=3.0, color="blue")
+            ax2.fill_between(X, np.zeros_like(mu), -self.acq_func(X, self.f_star), color="blue", alpha=0.3)
 
         plt.tight_layout()
 
