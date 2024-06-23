@@ -10,7 +10,7 @@ from src.utils.acquisition import ExpectedImprovement
 
 
 class GP:
-    def __init__(self, kernel, optimizer=None, alpha_=1e-10, n_restarts_optimizer=0, solver=None, precon=None,
+    def __init__(self, kernel, func, optimizer=None, alpha_=1e-10, n_restarts_optimizer=0, solver=None, precon=None,
                  acq_func=None):
         self.f_star = None
         self.optimizer = optimizer
@@ -27,6 +27,7 @@ class GP:
         self.n = None
         self.n_restarts_optimizer = n_restarts_optimizer
         self.acq_func = acq_func
+        self.func = func
 
     def fit(self, X, y):
         """Fit Gaussian process regression model.
@@ -270,7 +271,7 @@ class GP:
     def plot_gp(self, X, mu, cov, post=False, plot_acq=False):
         # Create a figure
         if plot_acq:
-            fig = plt.figure(figsize=(12, 5))
+            fig = plt.figure(figsize=(14, 4))
             ax1 = fig.add_subplot(121)
             ax2 = fig.add_subplot(122)
         else:
@@ -279,49 +280,44 @@ class GP:
 
         # Always plot the posterior
         delta = 1.96
+        fX = [self.func(X_i) for X_i in X]
         if post:
-            delta = (max(mu) - min(mu)) / 10
+            delta = (max(fX) - min(fX)) / 10
         xmin = min(X)
         xmax = max(X)
-        ymin = min(mu) - delta
-        ymax = max(mu) + delta
+        ymin = min(fX) - delta
+        ymax = max(fX) + delta
         X = X.ravel()
         mu = mu.ravel()
-        samples = np.random.multivariate_normal(mu, cov, 10)
-
         ax1.set_xlabel("$X$", fontsize=15)
         ax1.set_ylabel("$y$", fontsize=15)
-        ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
-        ax1.yaxis.set_major_locator(MaxNLocator(integer=True))
-        ax1.tick_params(direction="in", labelsize=15, length=10, width=0.8, colors='k')
         for edge in ["top", "bottom", "left", "right"]:
             ax1.spines[edge].set_linewidth(2.0)
-        ax1.plot(X, mu, color="purple", lw=2)
-        # for i, sample in enumerate(samples):
-        #     ax1.plot(X, sample, lw=0.5, ls='-', color="purple")
+        ax1.plot(X, mu, color="purple", lw=3.0)
+        ax1.plot(X, self.func(X), "--", color="grey", lw=3.0)
         if post:
-            ax1.scatter(self.X_train, self.y_train, color='k', linestyle='None', linewidth=1.0)
-        if plot_acq:
-            ax1.scatter(self.X_train[-1], self.y_train[-1], color='yellow', linestyle='None', linewidth=1.0)
-        stdpi = np.sqrt(np.diag(cov))[:, np.newaxis]
-        yy = np.linspace(ymin, ymax, len(X)).reshape([len(X), 1])
-        P = np.exp(-0.5 * (yy - mu.T) ** 2 / (stdpi ** 2).T)
-        ax1.imshow(P, extent=[xmin, xmax, ymin, ymax], aspect="auto", origin="lower", cmap="Purples", alpha=0.6)
+            ax1.scatter(self.X_train, self.y_train, color='k', linestyle='None', linewidth=3.0)
+        # if plot_acq:
+        #     ax1.scatter(self.X_train[-1], self.y_train[-1], color='yellow', linestyle='None', linewidth=3.0)
+
+        # Calculate the first standard deviation
+        std = np.sqrt(np.diag(cov))
+        # Plot the standard deviation and fill the area between
+        ax1.fill_between(X, mu - std, mu + std, color="purple", alpha=0.3)
+        ax1.plot(X, mu - std, color="grey", alpha=0.3, lw=3.0)
+        ax1.plot(X, mu + std, color="grey", alpha=0.3, lw=3.0)
+        ax1.set_xticks([])
+        ax1.set_yticks([])
 
         # Plot acquisition function if plot_acq is True
         if plot_acq:
-
             self.f_star = np.min(self.y_train)  # Current best known function value
-            self.acq_func = ExpectedImprovement(model=self,
-                                                xi=0.01,
-                                                bounds=[(min(self.X_train), max(self.X_train))])
-
+            self.acq_func = ExpectedImprovement(model=self, xi=0.01, bounds=[(min(self.X_train), max(self.X_train))])
             ax2.set_xlabel("$X$", fontsize=15)
             ax2.set_ylabel("$EI$", fontsize=15)
+            ax2.set_xticks([])
+            ax2.set_yticks([])
             ax2.set_xlim([min(X), max(X)])
-            ax2.xaxis.set_major_locator(MaxNLocator(integer=True))
-            ax2.yaxis.set_major_locator(MaxNLocator(integer=True))
-            ax2.tick_params(direction="in", labelsize=15, length=10, width=0.8, colors='k')
             for edge in ["top", "bottom", "left", "right"]:
                 ax2.spines[edge].set_linewidth(2.0)
             ax2.plot(X, -self.acq_func(X, self.f_star))

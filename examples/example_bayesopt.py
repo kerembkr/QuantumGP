@@ -33,10 +33,11 @@ model = GP(kernel=kernel,
            n_restarts_optimizer=5,
            solver=solver,
            precon=precon,
-           acq_func=acq_func)
+           acq_func=acq_func,
+           func=func)
 
 # Bayesian Optimization
-for i in range(5):
+for i in range(1):
     model.fit(X_train, y_train)                                                 # fit
     y_mean, y_cov = model.predict(X_test)                                       # predict
     model.plot_gp(X=X_test, mu=y_mean, cov=y_cov, post=True, plot_acq=True)     # plot
