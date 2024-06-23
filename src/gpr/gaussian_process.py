@@ -29,6 +29,8 @@ class GP:
         self.acq_func = acq_func
         self.func = func
 
+        plt.rcParams['text.usetex'] = True
+
     def fit(self, X, y):
         """Fit Gaussian process regression model.
 
@@ -269,6 +271,9 @@ class GP:
             save_fig("samples")
 
     def plot_gp(self, X, mu, cov, post=False, plot_acq=False):
+
+        # plt.rcParams['text.usetex'] = True
+
         # Create a figure
         if plot_acq:
             fig = plt.figure(figsize=(14, 4))
