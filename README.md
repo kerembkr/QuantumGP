@@ -1,5 +1,7 @@
 # QuantumGP
-Using Quantum Speed-Ups to accelerate Gaussian Process Regression (GPR)
+Using Quantum Speed-Ups to accelerate Gaussian Process Regression (GPR). The posterior distribution can be obtained 
+using Gaussian Inference. This includes the inversion of the covariance matrix. The inversion is accelerated using 
+classical and quantum algorithms.
 
 Quantum Solvers
 - Harrow-Hassidim-Lloyd (HHL) 
