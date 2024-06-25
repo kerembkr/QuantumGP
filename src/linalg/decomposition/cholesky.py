@@ -21,7 +21,6 @@ def cholesky(A):
     ValueError
         If the matrix A is not square or not positive definite.
     """
-
     # Ensure A is a numpy array
     A = np.array(A, dtype=float)
 
@@ -34,19 +33,16 @@ def cholesky(A):
     if not np.allclose(A, A.T):
         raise ValueError("Matrix must be symmetric")
 
-    # Initialize the lower triangular matrix L
-    L = np.zeros_like(A)
+    n = A.shape[0]
+    L = np.zeros_like(A, dtype=float)
 
-    # Perform the Cholesky decomposition
-    for i in range(n):
-        for j in range(i + 1):
-            _sum = sum(L[i, k] * L[j, k] for k in range(j))
-            if i == j:  # Diagonal elements
-                if A[i, i] - _sum <= 0:
-                    raise ValueError("Matrix is not positive definite")
-                L[i, j] = np.sqrt(A[i, i] - _sum)
-            else:
-                L[i, j] = (A[i, j] - _sum) / L[j, j]
+    for j in range(n):
+        # Compute L[j, j]
+        L[j, j] = np.sqrt(A[j, j] - np.sum(L[j, :j] ** 2))
+
+        # Compute L[j+1:n, j]
+        for i in range(j + 1, n):
+            L[i, j] = (A[i, j] - np.sum(L[i, :j] * L[j, :j])) / L[j, j]
 
     return L
 
@@ -54,15 +50,10 @@ def cholesky(A):
 if __name__ == "__main__":
 
     # Example usage
-    A = np.array([[4, 12, -16],
+    M = np.array([[4, 12, -16],
                   [12, 37, -43],
                   [-16, -43, 98]], dtype=float)
+    M = M @ M.T
 
-    try:u
-        L = cholesky(A)
-        print("Matrix A:")
-        print(A)
-        print("\nCholesky Decomposition (L):")
-        print(L)
-    except ValueError as e:
-        print(e)
+    lower = cholesky(M)
+    print(lower)
