@@ -272,8 +272,6 @@ class GP:
 
     def plot_gp(self, X, mu, cov, post=False, plot_acq=False):
 
-        # plt.rcParams['text.usetex'] = True
-
         # Create a figure
         if plot_acq:
             fig = plt.figure(figsize=(14, 4))
@@ -284,14 +282,6 @@ class GP:
             ax1 = fig.add_subplot(111)
 
         # Always plot the posterior
-        delta = 1.96
-        fX = [self.func(X_i) for X_i in X]
-        if post:
-            delta = (max(fX) - min(fX)) / 10
-        xmin = min(X)
-        xmax = max(X)
-        ymin = min(fX) - delta
-        ymax = max(fX) + delta
         X = X.ravel()
         mu = mu.ravel()
         ax1.set_xlabel("$X$", fontsize=15)
@@ -302,8 +292,6 @@ class GP:
         ax1.plot(X, self.func(X), "--", color="grey", lw=3.0)
         if post:
             ax1.scatter(self.X_train, self.y_train, color='k', linestyle='None', linewidth=3.0)
-        # if plot_acq:
-        #     ax1.scatter(self.X_train[-1], self.y_train[-1], color='yellow', linestyle='None', linewidth=3.0)
 
         # Calculate the first standard deviation
         std = np.sqrt(np.diag(cov))
