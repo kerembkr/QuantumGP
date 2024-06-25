@@ -1,37 +1,62 @@
 import numpy as np
 
 
-def partial_cholesky(A):
+def partial_cholesky(A, p=None):
     """
-    Partial Cholesky Decomposition
+    Performs the Cholesky decomposition of a positive definite matrix A.
+    The decomposition is such that A = L * L.T where L is a lower triangular matrix.
 
     Parameters
     ----------
-    A
+    A : numpy.ndarray
+        The matrix to be decomposed. Must be a square, symmetric, positive definite matrix.
 
     Returns
     -------
+    L : numpy.ndarray
+        The lower triangular matrix resulting from the decomposition.
 
+    Raises
+    ------
+    ValueError
+        If the matrix A is not square or not positive definite.
     """
+    # Ensure A is a numpy array
+    A = np.array(A, dtype=float)
 
-    n = len(A)
+    # Check if the matrix is square
+    n, m = A.shape
+    if n != m:
+        raise ValueError("Matrix must be square")
 
-    L = np.zeros_like(A)
+    # Check if the matrix is symmetric
+    if not np.allclose(A, A.T):
+        raise ValueError("Matrix must be symmetric")
 
-    for k in range(n):
-        L[k, k] = np.sqrt(L[k, k])
-        for i in range(k + 1, n):
-            if L[i, k] != 0:
-                L[i, k] = L[i, k] / L[k, k]
+    n = A.shape[0]
+    L = np.zeros_like(A, dtype=float)
 
-        for j in range(k + 1, n):
-            for i in range(j, n):
-                if L[i, j] != 0:
-                    L[i, j] = L[i, j] - L[i, k] * L[j, k]
+    if p is None:
+        p = n
 
-        for i in range(n):
-            for j in range(i + 1, n):
-                L[i, j] = 0
+    for j in range(p):
+        # Compute L[j, j]
+        L[j, j] = np.sqrt(A[j, j] - np.sum(L[j, :j] ** 2))
+
+        # Compute L[j+1:n, j]
+        for i in range(j + 1, n):
+            L[i, j] = (A[i, j] - np.sum(L[i, :j] * L[j, :j])) / L[j, j]
 
     return L
 
+
+if __name__ == "__main__":
+
+    # Example usage
+    M = np.array([[4, 12, -16],
+                  [12, 37, -43],
+                  [-16, -43, 98]], dtype=float)
+    M = M @ M.T
+
+    lower = partial_cholesky(M, p=1)
+    print(lower)
