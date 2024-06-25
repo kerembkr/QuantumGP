@@ -284,8 +284,8 @@ class GP:
         # Always plot the posterior
         X = X.ravel()
         mu = mu.ravel()
-        ax1.set_xlabel("$X$", fontsize=15)
-        ax1.set_ylabel("$y$", fontsize=15)
+        ax1.set_xlabel("$\mathcal{X}$", fontsize=15)
+        ax1.set_ylabel("$\mathcal{Y}$", fontsize=15)
         for edge in ["top", "bottom", "left", "right"]:
             ax1.spines[edge].set_linewidth(2.0)
         ax1.plot(X, mu, color="purple", lw=3.0)
@@ -306,7 +306,7 @@ class GP:
         if plot_acq:
             self.f_star = np.min(self.y_train)  # Current best known function value
             self.acq_func = ExpectedImprovement(model=self, xi=0.01, bounds=[(min(self.X_train), max(self.X_train))])
-            ax2.set_xlabel("$X$", fontsize=15)
+            ax2.set_xlabel("$\mathcal{X}$", fontsize=15)
             ax2.set_ylabel("$EI$", fontsize=15)
             ax2.set_xticks([])
             ax2.set_yticks([])

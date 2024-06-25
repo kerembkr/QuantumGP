@@ -56,7 +56,7 @@ def save_fig(name):
     output_dir = '/Users/kerembuekrue/Documents/code/QuantumGP/output/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    plt.savefig(os.path.join(output_dir, name + ".png"))
+    plt.savefig(os.path.join(output_dir, name + ".png"), dpi=1000)
 
 
 def get_paulis(mat):

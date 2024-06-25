@@ -4,6 +4,7 @@ from src.solver.solver import Solver
 from src.utils.assertions import (assert_not_none, assert_symmetric, assert_square, assert_not_singular,
                                   assert_positive_definite)
 
+
 class CG(Solver):
 
     def __init__(self, maxiter=None, tol=1e-8):
@@ -47,4 +48,3 @@ class CG(Solver):
                 self.iters = self.maxiter  # maximum number of iterations needed
                 raise RuntimeError("No convergence.")  # no convergence
         self.iters = i  # save number of iterations needed
-
