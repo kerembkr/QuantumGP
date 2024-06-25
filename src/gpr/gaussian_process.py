@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from operator import itemgetter
 from src.utils.utils import save_fig
 from matplotlib.ticker import MaxNLocator
-from scipy.linalg import cholesky, solve_triangular
+from scipy.linalg import cho_solve, cholesky, solve_triangular
 from src.utils.acquisition import ExpectedImprovement
 
 

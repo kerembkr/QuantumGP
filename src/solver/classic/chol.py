@@ -1,9 +1,7 @@
 import numpy as np
 from src.utils.utils import timing
 from src.solver.solver import Solver
-from src.linalg.decomposition.chol import cholesky_decompose
-from src.utils.assertions import (assert_not_none, assert_symmetric, assert_square, assert_not_singular,
-                                  assert_positive_definite)
+from src.linalg.decomposition.cholesky import cholesky_decompose
 
 
 class Cholesky(Solver):
@@ -17,13 +15,6 @@ class Cholesky(Solver):
         """
         Cholesky Solver
         """
-
-        assert_not_none(self.A, "Matrix A must be set before solving.")
-        assert_not_none(self.b, "Vector b must be set before solving.")
-        assert_symmetric(self.A)
-        assert_square(self.A)
-        assert_not_singular(self.A)
-        assert_positive_definite(self.A)
 
         self.L = cholesky_decompose(self.A)     # decompose
         self.x = self.cholesky_solve()          # solve
@@ -47,11 +38,23 @@ class Cholesky(Solver):
             z[i] = (self.b[i] - _sum) / self.L[i, i]
 
         # backward substitution
-        self.L = np.transpose(self.L)
         for i in range(self.N - 1, -1, -1):
             _sum = 0.0
             for j in range(i + 1, self.N):
-                _sum += self.L[i, j] * self.x[j]
+                _sum += self.L[j, i] * self.x[j]
             self.x[i] = (z[i] - _sum) / self.L[i, i]
 
         return self.x
+
+
+if __name__ == "__main__":
+
+    np.random.seed(42)
+    N = 200
+    A = np.random.rand(N, N)
+    A = A @ A.T
+    b = np.random.rand(N)
+
+    solver = Cholesky()
+    solver.set_lse(A=A, b=b)
+    solver.solve()

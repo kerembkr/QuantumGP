@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 from parameterized import parameterized
-from src.solver.classic.cholesky import Cholesky
+from src.solver.classic.chol import Cholesky
 from src.solver.classic.cg import CG
 from src.solver.classic.pcg import PCG
 from src.solver.quantum.vqls.vqls import VQLS

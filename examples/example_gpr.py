@@ -6,7 +6,7 @@ from input.testfuncs_1d import oscillatory_increasing_amplitude
 from src.solver.solver import Solver
 from src.solver.classic.cg import CG
 from src.solver.classic.pcg import PCG
-from src.solver.classic.cholesky import Cholesky
+from src.solver.classic.chol import Cholesky
 
 # choose function
 func = oscillatory_increasing_amplitude

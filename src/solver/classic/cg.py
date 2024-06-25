@@ -3,6 +3,7 @@ from src.utils.utils import timing
 from src.solver.solver import Solver
 from src.utils.assertions import (assert_not_none, assert_symmetric, assert_square, assert_not_singular,
                                   assert_positive_definite)
+from scipy.sparse.linalg import cg as scipy_cg
 
 
 class CG(Solver):
@@ -19,12 +20,12 @@ class CG(Solver):
         Conjugate Gradient Method
         """
 
-        assert_not_none(self.A, "Matrix A must be set before solving.")
-        assert_not_none(self.b, "Vector b must be set before solving.")
-        # assert_symmetric(self.A)
-        assert_square(self.A)
-        assert_not_singular(self.A)
-        # assert_positive_definite(self.A)
+        # assert_not_none(self.A, "Matrix A must be set before solving.")
+        # assert_not_none(self.b, "Vector b must be set before solving.")
+        # # assert_symmetric(self.A)
+        # assert_square(self.A)
+        # assert_not_singular(self.A)
+        # # assert_positive_definite(self.A)
 
         if self.maxiter is None:
             self.maxiter = 10 * self.N
@@ -48,3 +49,25 @@ class CG(Solver):
                 self.iters = self.maxiter  # maximum number of iterations needed
                 raise RuntimeError("No convergence.")  # no convergence
         self.iters = i  # save number of iterations needed
+
+
+if __name__ == "__main__":
+
+    from time import time
+
+    np.random.seed(42)
+    N = 2000
+    A = np.random.rand(N, N)
+    A = A @ A.T
+    b = np.random.rand(N)
+
+    solver = CG()
+    solver.set_lse(A=A, b=b)
+
+    ta = time()
+    solver.solve()
+    print(time()-ta)
+
+    ta = time()
+    x_scipy = scipy_cg(A, b)
+    print(time() - ta)

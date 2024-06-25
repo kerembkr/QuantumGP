@@ -3,7 +3,7 @@ from src.kernels.rbf import RBFKernel
 from src.gpr.gaussian_process import GP
 from src.utils.utils import data_from_func
 from input.testfuncs_1d import sin_tanh
-from src.solver.classic.cholesky import Cholesky
+from src.solver.classic.chol import Cholesky
 
 np.random.seed(237)
 
