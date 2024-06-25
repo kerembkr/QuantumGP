@@ -1,7 +1,8 @@
 import numpy as np
 from src.utils.utils import timing
 from src.solver.solver import Solver
-from src.linalg.decomposition.cholesky import cholesky_decompose
+from src.linalg.decomposition.cholesky import cholesky
+from src.linalg.decomposition.partial_cholesky import partial_cholesky
 
 
 class Cholesky(Solver):
@@ -16,7 +17,8 @@ class Cholesky(Solver):
         Cholesky Solver
         """
 
-        self.L = cholesky_decompose(self.A)     # decompose
+        # self.L = cholesky(self.A)     # decompose
+        self.L = partial_cholesky(self.A, p=3)  # decompose
         self.x = self.cholesky_solve()          # solve
 
     def cholesky_solve(self):
@@ -50,7 +52,7 @@ class Cholesky(Solver):
 if __name__ == "__main__":
 
     np.random.seed(42)
-    N = 200
+    N = 5
     A = np.random.rand(N, N)
     A = A @ A.T
     b = np.random.rand(N)
@@ -58,3 +60,6 @@ if __name__ == "__main__":
     solver = Cholesky()
     solver.set_lse(A=A, b=b)
     solver.solve()
+
+    print(solver.x)
+    print(np.linalg.solve(A, b))

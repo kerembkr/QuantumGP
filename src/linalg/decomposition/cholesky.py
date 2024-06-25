@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.linalg import cholesky as cholesky_scipy
 
 
 def cholesky(A):
@@ -35,14 +36,21 @@ def cholesky(A):
 
     n = A.shape[0]
     L = np.zeros_like(A, dtype=float)
+    A_ = A.copy()
 
     for j in range(n):
-        # Compute L[j, j]
-        L[j, j] = np.sqrt(A[j, j] - np.sum(L[j, :j] ** 2))
 
-        # Compute L[j+1:n, j]
+        # compute j-th row of L
+        I = np.zeros(n)
+        I[j] = np.sqrt(A[j, j] - np.sum(L[j, :j] ** 2))
         for i in range(j + 1, n):
-            L[i, j] = (A[i, j] - np.sum(L[i, :j] * L[j, :j])) / L[j, j]
+            I[i] = (A[i, j] - np.sum(L[i, :j] * L[j, :j])) / I[j]
+
+        # save j-th column in L
+        L[:, j] = I
+
+        # residual
+        A_ = A_ - np.outer(I, I.T)
 
     return L
 
@@ -56,4 +64,6 @@ if __name__ == "__main__":
     M = M @ M.T
 
     lower = cholesky(M)
+    lower_scipy = cholesky_scipy(M, lower=True)
     print(lower)
+    print(lower_scipy)

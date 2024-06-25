@@ -3,13 +3,15 @@ import numpy as np
 
 def partial_cholesky(A, p=None):
     """
-    Performs the Cholesky decomposition of a positive definite matrix A.
+    Performs the partial Cholesky decomposition of a positive definite matrix A.
     The decomposition is such that A = L * L.T where L is a lower triangular matrix.
 
     Parameters
     ----------
     A : numpy.ndarray
         The matrix to be decomposed. Must be a square, symmetric, positive definite matrix.
+    p : int, optional
+        Number of columns of the Cholesky decomposition matrix L to be computed. Default is None (computes full decomposition).
 
     Returns
     -------
@@ -56,7 +58,8 @@ if __name__ == "__main__":
     M = np.array([[4, 12, -16],
                   [12, 37, -43],
                   [-16, -43, 98]], dtype=float)
-    M = M @ M.T
+    M = M @ M.T  # Ensure M is positive definite
 
     lower = partial_cholesky(M, p=1)
+    print("Partial Cholesky decomposition:")
     print(lower)
