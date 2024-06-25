@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.linalg import cholesky as cholesky_scipy
 
 
 def partial_cholesky(A, p=None):
@@ -10,8 +11,6 @@ def partial_cholesky(A, p=None):
     ----------
     A : numpy.ndarray
         The matrix to be decomposed. Must be a square, symmetric, positive definite matrix.
-    p : int, optional
-        Number of columns of the Cholesky decomposition matrix L to be computed. Default is None (computes full decomposition).
 
     Returns
     -------
@@ -37,17 +36,24 @@ def partial_cholesky(A, p=None):
 
     n = A.shape[0]
     L = np.zeros_like(A, dtype=float)
+    A_ = A.copy()
 
     if p is None:
         p = n
 
     for j in range(p):
-        # Compute L[j, j]
-        L[j, j] = np.sqrt(A[j, j] - np.sum(L[j, :j] ** 2))
 
-        # Compute L[j+1:n, j]
+        # compute j-th row of L
+        I = np.zeros(n)
+        I[j] = np.sqrt(A[j, j] - np.sum(L[j, :j] ** 2))
         for i in range(j + 1, n):
-            L[i, j] = (A[i, j] - np.sum(L[i, :j] * L[j, :j])) / L[j, j]
+            I[i] = (A[i, j] - np.sum(L[i, :j] * L[j, :j])) / I[j]
+
+        # save j-th column in L
+        L[:, j] = I
+
+        # residual
+        A_ = A_ - np.outer(I, I.T)
 
     return L
 
@@ -58,8 +64,9 @@ if __name__ == "__main__":
     M = np.array([[4, 12, -16],
                   [12, 37, -43],
                   [-16, -43, 98]], dtype=float)
-    M = M @ M.T  # Ensure M is positive definite
+    M = M @ M.T
 
-    lower = partial_cholesky(M, p=1)
-    print("Partial Cholesky decomposition:")
+    lower = partial_cholesky(M, p=2)
+    lower_scipy = cholesky_scipy(M, lower=True)
     print(lower)
+    print(lower_scipy)
