@@ -1,8 +1,9 @@
 import numpy as np
 from scipy.linalg import cholesky as cholesky_scipy
+import random
 
 
-def cholesky(A, p=None):
+def cholesky(A, p=None, rnd_idx=False):
     """
     Performs the Cholesky decomposition of a positive definite matrix A and
     provides an approximation to the inverse of A.
@@ -12,6 +13,8 @@ def cholesky(A, p=None):
 
     Parameters
     ----------
+    rnd_idx : boolean
+        If set to true, the indices are chosen randomly, else they are chosen in a lexicographic order.
     A : numpy.ndarray
         The matrix to be decomposed. Must be a square, symmetric, positive definite matrix.
     p : int, optional
@@ -29,7 +32,14 @@ def cholesky(A, p=None):
     ------
     ValueError
         If the matrix A is not square or not symmetric.
+
+
+    Notes
+    -----
+    The residual can be computed using  A_ = A - L @ L.T. It is defined as the current Cholesky approximation subtracted
+    from the matrix A.
     """
+
     # Ensure A is a numpy array
     A = np.array(A, dtype=float)
 
@@ -53,17 +63,21 @@ def cholesky(A, p=None):
     L = np.zeros_like(A, dtype=float)  # lower triangular Cholesky factor
     C = np.zeros_like(A, dtype=float)  # inverse approximation
 
-    # Cholesky decomposition with Inverse Approximation
-    for i in range(p):
-        e_i = np.eye(n)[:, i]                       # unit vector
+    # choice of index order (lexicographic or random)
+    indices = list(range(n))
+
+    for i in range(p):                              # Cholesky decomposition with Inverse Approximation
+        index = i                                   # lexicographic order
+        if rnd_idx:                                 # if random order was chosen
+            index = random.choice(indices)          # choose random index
+            indices.remove(index)                   # remove index from list
+        e_i = np.eye(n)[:, index]                   # unit vector
         s_i = e_i                                   # action
         d_i = (np.eye(n) - C @ A) @ s_i             # search direction
         eta_i = s_i.T @ (A @ d_i)                   # normalization constant
         l_i = (1.0 / np.sqrt(eta_i)) * (A @ d_i)    # matrix observation
         C += (1.0 / eta_i) * np.outer(d_i, d_i)     # inverse estimate
         L[:, i] = l_i                               # lower Cholesky factor
-        A_ = A - L @ L.T                            # residual
-        # print("iter {:d} res : {:.4e}".format(i, np.linalg.norm(A_, "fro")))  # print residual
 
     return L, C
 
