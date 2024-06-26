@@ -62,16 +62,15 @@ class GP:
         K_[np.diag_indices_from(K_)] += self.alpha_
 
         # NEW
-        self.solver.set_lse(A=K_, b=self.y_train)
-        self.solver.solve()
-        self.alpha = self.solver.x
+        # self.solver.set_lse(A=K_, b=self.y_train)
+        # self.solver.solve()
+        # self.alpha = self.solver.x
 
         # OLD (CHOLESKY)
         # K_ = L*L^T --> L
         self.L = cholesky(K_, lower=True, check_finite=False)
-
         #  alpha = L^T \ (L \ y)
-        # self.alpha = cho_solve((self.L, True), self.y_train, check_finite=False)
+        self.alpha = cho_solve((self.L, True), self.y_train, check_finite=False)
 
         return self
 
