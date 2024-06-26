@@ -30,7 +30,8 @@ model = GP(kernel=kernel,
            alpha_=eps ** 2,
            n_restarts_optimizer=5,
            solver=solver,
-           precon=precon)
+           precon=precon,
+           func=func)
 
 # fit
 model.fit(X_train, y_train)
@@ -38,9 +39,7 @@ model.fit(X_train, y_train)
 # predict
 y_mean, y_cov = model.predict(X_test)
 
-# plot prior
-model.plot_gp(X=X_test, mu=np.zeros(len(X_test)), cov=model.kernel(X_test))
+# # plot prior
+# model.plot_gp(X=X_test, mu=np.zeros(len(X_test)), cov=model.kernel(X_test))
 # plot posterior
 model.plot_gp(X=X_test, mu=y_mean, cov=y_cov, post=True)
-# plot samples
-model.plot_samples(5, save_png=True)

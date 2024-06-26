@@ -50,20 +50,20 @@ def cholesky(A, p=None):
         p = n
 
     # memory allocation
-    L = np.zeros_like(A, dtype=float)
-    C = np.zeros_like(A, dtype=float)
+    L = np.zeros_like(A, dtype=float)  # lower triangular Cholesky factor
+    C = np.zeros_like(A, dtype=float)  # inverse approximation
 
     # Cholesky decomposition with Inverse Approximation
     for i in range(p):
-        e_i = np.eye(n)[:, i]  # unit vector
-        s_i = e_i  # action
-        d_i = (np.eye(n) - C @ A) @ s_i  # search direction
-        eta_i = s_i.T @ (A @ d_i)  # normalization constant
-        l_i = (1.0 / np.sqrt(eta_i)) * (A @ d_i)  # matrix observation
-        C += (1.0 / eta_i) * np.outer(d_i, d_i)  # inverse estimate
-        L[:, i] = l_i  # lower Cholesky factor
-        A_ = A - L @ L.T  # residual
-        print("res : {:.4e}".format(np.linalg.norm(A_, "fro")))  # print residual
+        e_i = np.eye(n)[:, i]                       # unit vector
+        s_i = e_i                                   # action
+        d_i = (np.eye(n) - C @ A) @ s_i             # search direction
+        eta_i = s_i.T @ (A @ d_i)                   # normalization constant
+        l_i = (1.0 / np.sqrt(eta_i)) * (A @ d_i)    # matrix observation
+        C += (1.0 / eta_i) * np.outer(d_i, d_i)     # inverse estimate
+        L[:, i] = l_i                               # lower Cholesky factor
+        A_ = A - L @ L.T                            # residual
+        # print("iter {:d} res : {:.4e}".format(i, np.linalg.norm(A_, "fro")))  # print residual
 
     return L, C
 
@@ -71,11 +71,11 @@ def cholesky(A, p=None):
 if __name__ == "__main__":
 
     # random spd matrix
-    n = 5
-    M = np.random.rand(n, n)
+    N = 500
+    M = np.random.rand(N, N)
     M = M @ M.T
 
-    lower_, invM_ = cholesky(M, p=n)
+    lower_, invM_ = cholesky(M, p=N)
     lower = cholesky_scipy(M, lower=True)
     invM = np.linalg.inv(M)
 

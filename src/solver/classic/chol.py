@@ -2,7 +2,6 @@ import numpy as np
 from src.utils.utils import timing
 from src.solver.solver import Solver
 from src.linalg.decomposition.cholesky import cholesky
-from src.linalg.decomposition.partial_cholesky import partial_cholesky
 
 
 class Cholesky(Solver):

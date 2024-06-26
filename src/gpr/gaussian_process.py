@@ -7,6 +7,7 @@ from src.utils.utils import save_fig
 from matplotlib.ticker import MaxNLocator
 from scipy.linalg import cho_solve, cholesky, solve_triangular
 from src.utils.acquisition import ExpectedImprovement
+from src.linalg.decomposition.cholesky import cholesky as cholesky_winv
 
 
 class GP:
@@ -28,6 +29,7 @@ class GP:
         self.n_restarts_optimizer = n_restarts_optimizer
         self.acq_func = acq_func
         self.func = func
+        self.invK = None
 
         plt.rcParams['text.usetex'] = True
 
@@ -65,12 +67,12 @@ class GP:
         # self.solver.set_lse(A=K_, b=self.y_train)
         # self.solver.solve()
         # self.alpha = self.solver.x
+        self.L, self.invK = cholesky_winv(K_, p=5)
+        self.alpha = self.invK @ self.y_train
 
         # OLD (CHOLESKY)
-        # K_ = L*L^T --> L
-        self.L = cholesky(K_, lower=True, check_finite=False)
-        #  alpha = L^T \ (L \ y)
-        self.alpha = cho_solve((self.L, True), self.y_train, check_finite=False)
+        # self.L = cholesky(K_, lower=True, check_finite=False)  # K_ = L*L^T --> L
+        # self.alpha = cho_solve((self.L, True), self.y_train, check_finite=False)  # alpha = L^T \ (L \ y)
 
         return self
 
@@ -159,9 +161,14 @@ class GP:
             # MEAN
             y_mean_ = K_trans @ self.alpha
 
+            # NEW
             # STDDEV
-            V = solve_triangular(self.L, K_trans.T, lower=True, check_finite=False)
-            y_cov_ = self.kernel(X) - V.T @ V
+            y_cov_ = self.kernel(X) - K_trans @ (self.invK @ K_trans.T)
+
+            # OLD
+            # STDDEV
+            # V = solve_triangular(self.L, K_trans.T, lower=True, check_finite=False)
+            # y_cov_ = self.kernel(X) - V.T @ V
 
             return y_mean_, y_cov_
 
