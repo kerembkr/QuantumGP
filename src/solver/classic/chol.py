@@ -16,9 +16,8 @@ class Cholesky(Solver):
         Cholesky Solver
         """
 
-        # self.L = cholesky(self.A)     # decompose
-        self.L = partial_cholesky(self.A, p=3)  # decompose
-        self.x = self.cholesky_solve()          # solve
+        self.L, _ = cholesky(self.A)    # decompose
+        self.x = self.cholesky_solve()  # solve
 
     def cholesky_solve(self):
         """
