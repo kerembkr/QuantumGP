@@ -1,23 +1,28 @@
 import numpy as np
-from src.utils.utils import timing
+from src.utils.utils import spd
 from src.solver.solver import Solver
-from src.linalg.decomposition.cholesky import cholesky
+from src.linalg.cholesky import cholesky
 
 
 class Cholesky(Solver):
 
-    def __init__(self):
+    def __init__(self, rank=None, rnd_idx=False):
         super().__init__()
         self.L = None
+        self.rank = rank
+        self.rnd_idx = rnd_idx
+        self.invM = None
 
-    @timing
     def solve(self):
         """
         Cholesky Solver
         """
 
-        self.L, _ = cholesky(self.A)    # decompose
-        self.x = self.cholesky_solve()  # solve
+        self.L, self.invM = cholesky(self.A, p=self.rank, rnd_idx=False)    # decompose
+        # self.x = self.cholesky_solve()  # solve
+        self.x = self.invM @ self.b
+
+        return self.x
 
     def cholesky_solve(self):
         """
@@ -49,15 +54,19 @@ class Cholesky(Solver):
 
 if __name__ == "__main__":
 
+    # fix random seed
     np.random.seed(42)
-    N = 5
-    A = np.random.rand(N, N)
-    A = A @ A.T
+
+    # linear system
+    N = 300
+    A = spd(N)
     b = np.random.rand(N)
 
-    solver = Cholesky()
+    # solve system
+    solver = Cholesky(rank=N)
     solver.set_lse(A=A, b=b)
     solver.solve()
 
-    print(solver.x)
-    print(np.linalg.solve(A, b))
+    # accuracy
+    print("sol ", np.linalg.norm(solver.x - np.linalg.solve(A, b)))
+    print("inv ", np.linalg.norm(solver.invM - np.linalg.inv(A)))

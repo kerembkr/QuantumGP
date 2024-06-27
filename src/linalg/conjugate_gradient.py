@@ -16,6 +16,9 @@ def cg(A, b, maxiter=None, tol=1e-8):
     -------
 
     """
+
+    N = len(b)
+
     if maxiter is None:
         maxiter = 10 * N
 
@@ -58,7 +61,7 @@ def cg_winv(A, b, maxiter=None, rtol=1e-6, atol=1e-6):
     if maxiter is None:
         maxiter = 10 * n
 
-    x = np.zeros(N)                                 # initial solution guess
+    x = np.zeros(n)                                 # initial solution guess
     C = np.zeros_like(A)                            # inverse approximation
     r = b - A @ x                                   # initial residual
     i = 0                                           # iteration counter

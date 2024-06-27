@@ -6,15 +6,13 @@ import matplotlib.pyplot as plt
 import pennylane as qml
 
 
-
-
 def spd(n):
-
     rnd_mat = np.random.rand(n, n)
 
     rnd_spd = rnd_mat @ rnd_mat.T
 
     return rnd_spd
+
 
 def timing(f):
     @wraps(f)
@@ -51,7 +49,7 @@ def data_from_func(f, N, M, xx, noise=0.1, rand=False):
 
     # training data
     if rand:
-        X_train = np.random.rand(N)*(xmax_tr-xmin_tr) + xmin_tr
+        X_train = np.random.rand(N) * (xmax_tr - xmin_tr) + xmin_tr
     else:
         X_train = np.linspace(xmin_tr, xmax_tr, N)
     y_train = [f(X_) + np.random.rand() * 2 * noise - noise for X_ in X_train]

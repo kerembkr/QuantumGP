@@ -5,10 +5,9 @@ import matplotlib.pyplot as plt
 from operator import itemgetter
 from src.utils.utils import save_fig
 from matplotlib.ticker import MaxNLocator
-from scipy.linalg import cho_solve, cholesky, solve_triangular
+from scipy.linalg import cholesky
 from src.utils.acquisition import ExpectedImprovement
-from src.linalg.decomposition.cholesky import cholesky as cholesky_winv
-from src.linalg.decomposition.conjugate_gradient import cg
+from src.linalg.cholesky import cholesky as cholesky_winv
 
 
 class GP:
@@ -206,6 +205,7 @@ class GP:
         dloglik = np.zeros(len(hypers))
         for i in range(len(hypers)):
             dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(np.linalg.solve(G, dK[i]))
+            # dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(self.solver.invK @ dK[i])
 
         if eval_gradient:
             return loglik, dloglik
