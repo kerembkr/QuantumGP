@@ -1,7 +1,7 @@
 import numpy as np
 from src.utils.utils import spd
 from src.solver.solver import Solver
-from src.linalg.preconditioned_conjugate_gradient import pcg, pcg_winv
+from src.linalg.preconditioned_conjugate_gradient import pcg
 from src.linalg.cholesky import cholesky
 
 
@@ -27,12 +27,12 @@ class PCG(Solver):
             L, _ = cholesky(self.A, p=self.pre_iters, rnd_idx=True)
             self.P = L @ L.T
 
-        self.x, self.invM = pcg_winv(A=self.A,
-                                     b=self.b,
-                                     maxiter=self.rank,
-                                     atol=self.tol,
-                                     rtol=self.tol,
-                                     P=self.P)
+        self.x, self.invM = pcg(A=self.A,
+                                b=self.b,
+                                maxiter=self.rank,
+                                atol=self.tol,
+                                rtol=self.tol,
+                                P=self.P)
 
         return self.x
 

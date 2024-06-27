@@ -1,7 +1,7 @@
 import numpy as np
 from src.utils.utils import spd
 from src.solver.solver import Solver
-from src.linalg.conjugate_gradient import cg, cg_winv
+from src.linalg.conjugate_gradient import cg
 
 
 class CG(Solver):
@@ -18,17 +18,16 @@ class CG(Solver):
         Solve the linear system of equations Ax=b using the conjugate gradient method
         """
 
-        self.x, self.invM = cg_winv(A=self.A,
-                                    b=self.b,
-                                    maxiter=self.rank,
-                                    atol=self.tol,
-                                    rtol=self.tol)
+        self.x, self.invM = cg(A=self.A,
+                               b=self.b,
+                               maxiter=self.rank,
+                               atol=self.tol,
+                               rtol=self.tol)
 
         return self.x
 
 
 if __name__ == "__main__":
-
     # fix random seed
     np.random.seed(42)
 
