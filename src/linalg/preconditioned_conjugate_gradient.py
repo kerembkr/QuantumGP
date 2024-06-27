@@ -41,12 +41,13 @@ def pcg(A, b, maxiter=None, tol=1e-8):
     return x
 
 
-def pcg_winv(A, b, maxiter=None, rtol=1e-6, atol=1e-6):
+def pcg_winv(A, b, maxiter=None, rtol=1e-6, atol=1e-6, P=None):
     """
     Conjugate gradient method
 
     Parameters
     ----------
+    P
     atol
     rtol
     A
@@ -62,6 +63,11 @@ def pcg_winv(A, b, maxiter=None, rtol=1e-6, atol=1e-6):
     if maxiter is None:
         maxiter = 10 * n
 
+    if P is None:
+        P = np.eye(n)
+
+    invP = mat_inv_lemma(np.eye(n), P, np.eye(n), np.eye(n))
+
     x = np.zeros(n)  # initial solution guess
     C = np.zeros_like(A)  # inverse approximation
     r = b - A @ x  # initial residual
@@ -69,7 +75,7 @@ def pcg_winv(A, b, maxiter=None, rtol=1e-6, atol=1e-6):
     tol = max(rtol * np.linalg.norm(b), atol)  # threshold
     while np.linalg.norm(r) > tol:  # CG loop
         r = b - A @ x  # residual
-        s = r  # action
+        s = invP @ r  # action (NEW)
         alpha = s.T @ r  # observation
         d = (np.eye(n) - C @ A) @ s  # search direction
         eta = s.T @ (A @ d)  # normalization constant
@@ -81,6 +87,19 @@ def pcg_winv(A, b, maxiter=None, rtol=1e-6, atol=1e-6):
             return x, C
 
     return x, C
+
+
+def mat_inv_lemma(A, U, C, V):
+    # Invert the matrix A
+    A_inv = np.linalg.inv(A)
+
+    # Compute the intermediate matrix (C^{-1} + V A^{-1} U)^{-1}
+    inter_matrix = np.linalg.inv(C + V @ A_inv @ U)
+
+    # Compute the inverted matrix using the matrix inversion lemma
+    inv_mat = A_inv - A_inv @ U @ inter_matrix @ V @ A_inv
+
+    return inv_mat
 
 
 if __name__ == "__main__":

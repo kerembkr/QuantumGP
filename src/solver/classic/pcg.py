@@ -1,7 +1,8 @@
 import numpy as np
 from src.utils.utils import spd
 from src.solver.solver import Solver
-from src.linalg.conjugate_gradient import cg, cg_winv
+from src.linalg.preconditioned_conjugate_gradient import pcg, pcg_winv
+from src.linalg.cholesky import cholesky
 
 
 class PCG(Solver):
@@ -12,23 +13,28 @@ class PCG(Solver):
         self.rank = rank
         self.tol = tol
         self.invM = None
+        self.P = None
 
     def solve(self):
         """
         Solve the linear system of equations Ax=b using the conjugate gradient method
         """
 
-        self.x, self.invM = cg_winv(A=self.A,
-                                    b=self.b,
-                                    maxiter=self.rank,
-                                    atol=self.tol,
-                                    rtol=self.tol)
+        L, _ = cholesky(self.A, p=5, rnd_idx=True)
+
+        self.P = L @ L.T
+
+        self.x, self.invM = pcg_winv(A=self.A,
+                                     b=self.b,
+                                     maxiter=self.rank,
+                                     atol=self.tol,
+                                     rtol=self.tol,
+                                     P=self.P)
 
         return self.x
 
 
 if __name__ == "__main__":
-
     # fix random seed
     np.random.seed(42)
 
