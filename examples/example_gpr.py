@@ -20,6 +20,7 @@ eps = 0.1
 
 # choose solver
 solver = Cholesky()
+solver = CG()
 
 # choose preconditioner
 precon = None
@@ -39,7 +40,5 @@ model.fit(X_train, y_train)
 # predict
 y_mean, y_cov = model.predict(X_test)
 
-# # plot prior
-# model.plot_gp(X=X_test, mu=np.zeros(len(X_test)), cov=model.kernel(X_test))
 # plot posterior
 model.plot_gp(X=X_test, mu=y_mean, cov=y_cov, post=True)

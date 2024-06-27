@@ -65,8 +65,7 @@ class GP:
 
         # NEW
         # self.solver.set_lse(A=K_, b=self.y_train)
-        # self.solver.solve()
-        # self.alpha = self.solver.x
+        # self.alpha, self.invK = self.solver.solve()
         self.L, self.invK = cholesky_winv(K_, p=5)
         self.alpha = self.invK @ self.y_train
 
@@ -193,10 +192,9 @@ class GP:
         G = K + self.alpha_ * np.eye(self.n)  # add noise
 
         (s, ld) = np.linalg.slogdet(G)  # compute log determinant of symmetric pos.def. matrix
-        a = np.linalg.solve(G, self.y_train)  # G \\ Y
-        # self.solver.set_lse(G, self.y_train)
-        # self.solver.solve()
-        # a = self.solver.x
+        # a = np.linalg.solve(G, self.y_train)  # G \\ Y
+        self.solver.set_lse(G, self.y_train)
+        a = self.solver.solve()
 
         # log likelihood
         loglik = np.inner(self.y_train, a) + ld  # (Y / G) * Y + log |G|
@@ -204,8 +202,8 @@ class GP:
         # gradient
         dloglik = np.zeros(len(hypers))
         for i in range(len(hypers)):
-            dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(np.linalg.solve(G, dK[i]))
-            # dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(self.solver.invK @ dK[i])
+            # dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(np.linalg.solve(G, dK[i]))
+            dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(self.solver.invM @ dK[i])
 
         if eval_gradient:
             return loglik, dloglik
