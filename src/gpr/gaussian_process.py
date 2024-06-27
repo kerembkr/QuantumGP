@@ -64,6 +64,7 @@ class GP:
 
         if self.solver is not None:  # custom solver
             self.solver.set_lse(A=K_, b=self.y_train)
+            print("cond(A) =", self.solver.condA)
             self.alpha = self.solver.solve()
         else:  # standard Cholesky
             self.L = cholesky(K_, lower=True, check_finite=False)  # K_ = L*L^T --> L

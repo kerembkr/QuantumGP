@@ -18,7 +18,7 @@ eps = 0.1
 
 # choose solver
 # solver = Cholesky(rank=10, rnd_idx=True)
-solver = CG(rank=5)
+solver = CG(rank=10)
 # solver = None
 
 # choose preconditioner
@@ -36,12 +36,12 @@ model = GP(kernel=kernel,
 # fit
 t0 = time()
 model.fit(X_train, y_train)
-print("time to fit     : {:.4f} sec".format(time()-t0))
+print("fit     : {:.4f} sec".format(time()-t0))
 
 # predict
 t0 = time()
 y_mean, y_cov = model.predict(X_test)
-print("time to predict : {:.4f} sec".format(time()-t0))
+print("predict : {:.4f} sec".format(time()-t0))
 
 # plot posterior
 model.plot_gp(X=X_test, mu=y_mean, cov=y_cov, post=True)
