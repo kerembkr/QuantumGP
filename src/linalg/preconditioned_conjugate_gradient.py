@@ -90,14 +90,15 @@ def pcg_winv(A, b, maxiter=None, rtol=1e-6, atol=1e-6, P=None):
 
 
 def mat_inv_lemma(A, U, C, V):
-    # Invert the matrix A
-    A_inv = np.linalg.inv(A)
 
-    # Compute the intermediate matrix (C^{-1} + V A^{-1} U)^{-1}
-    inter_matrix = np.linalg.inv(C + V @ A_inv @ U)
+    invA = np.linalg.inv(A)
+    invC = np.linalg.inv(C)
 
-    # Compute the inverted matrix using the matrix inversion lemma
-    inv_mat = A_inv - A_inv @ U @ inter_matrix @ V @ A_inv
+    a = invA @ U
+    b = np.linalg.inv(invC + V.T @ (invA @ U))
+    c = V.T @ invA
+
+    inv_mat = invA - a @ (b @ c)
 
     return inv_mat
 
@@ -110,6 +111,6 @@ if __name__ == "__main__":
     b_ = np.random.rand(N)
 
     xsol1 = pcg(A_, b_)
-    xsol2, invA = pcg_winv(A_, b_)
+    xsol2, invA_ = pcg_winv(A_, b_)
 
     print(np.linalg.norm(xsol1 - np.linalg.solve(A_, b_)))
