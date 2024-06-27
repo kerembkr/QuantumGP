@@ -6,6 +6,16 @@ import matplotlib.pyplot as plt
 import pennylane as qml
 
 
+
+
+def spd(n):
+
+    rnd_mat = np.random.rand(n, n)
+
+    rnd_spd = rnd_mat @ rnd_mat.T
+
+    return rnd_spd
+
 def timing(f):
     @wraps(f)
     def wrap(*args, **kw):

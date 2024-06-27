@@ -69,8 +69,8 @@ def cg_winv(A, b, maxiter=None, rtol=1e-6, atol=1e-6):
         alpha = s.T @ r                             # observation
         d = (np.eye(n) - C @ A) @ s                 # search direction
         eta = s.T @ (A @ d)                         # normalization constant
-        C = C + 1.0/eta * np.outer(d, d)            # inverse estimate
-        x = x + alpha / eta * d                     # solution estimate
+        C += 1.0/eta * np.outer(d, d)               # inverse estimate
+        x += alpha / eta * d                        # solution estimate
         i += 1                                      # update iteration counter
         if i == maxiter:                            # convergence criteria
             raise RuntimeError("No convergence.")   # no convergence

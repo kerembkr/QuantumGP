@@ -8,6 +8,7 @@ from matplotlib.ticker import MaxNLocator
 from scipy.linalg import cho_solve, cholesky, solve_triangular
 from src.utils.acquisition import ExpectedImprovement
 from src.linalg.decomposition.cholesky import cholesky as cholesky_winv
+from src.linalg.decomposition.conjugate_gradient import cg
 
 
 class GP:
@@ -194,6 +195,9 @@ class GP:
 
         (s, ld) = np.linalg.slogdet(G)  # compute log determinant of symmetric pos.def. matrix
         a = np.linalg.solve(G, self.y_train)  # G \\ Y
+        # self.solver.set_lse(G, self.y_train)
+        # self.solver.solve()
+        # a = self.solver.x
 
         # log likelihood
         loglik = np.inner(self.y_train, a) + ld  # (Y / G) * Y + log |G|

@@ -1,9 +1,6 @@
 import numpy as np
-from src.utils.utils import timing
+from src.utils.utils import spd
 from src.solver.solver import Solver
-from src.utils.assertions import (assert_not_none, assert_symmetric, assert_square, assert_not_singular,
-                                  assert_positive_definite)
-from scipy.sparse.linalg import cg as scipy_cg
 
 
 class CG(Solver):
@@ -14,60 +11,83 @@ class CG(Solver):
         self.maxiter = maxiter
         self.tol: float = tol
 
-    @timing
     def solve(self):
         """
-        Conjugate Gradient Method
+        Solve the linear system of equations Ax=b using the conjugate gradient method
         """
 
-        # assert_not_none(self.A, "Matrix A must be set before solving.")
-        # assert_not_none(self.b, "Vector b must be set before solving.")
-        # # assert_symmetric(self.A)
-        # assert_square(self.A)
-        # assert_not_singular(self.A)
-        # # assert_positive_definite(self.A)
+        self.x = self.cg()
 
+    def cg(self):
+        """
+        Conjugate gradient method
+
+        Returns
+        -------
+
+        """
         if self.maxiter is None:
             self.maxiter = 10 * self.N
 
         self.x = np.zeros(self.N)  # initial solution guess
         r = self.b - self.A @ self.x  # initial residual
         d = r.copy()  # initial search direction
-        delta_new: float = r.T @ r  # initial squared residual
-        i: int = 0  # iteration counter
-        while (np.sqrt(delta_new) > self.tol) and (i < self.maxiter):  # start CG method
-            q = self.A @ d  # matrix-vector product Ad
-            alpha: float = delta_new / (d.T @ q)  # step size
-            self.x = self.x + alpha * d  # update solution
-            r = r - alpha * q  # update residual
-            delta_old: float = delta_new  # save old squared residual
-            delta_new = r.T @ r  # new squared residual
-            beta: float = delta_new / delta_old  # calculate beta
-            d = r + beta * d  # update search direction
+        i = 0  # iteration counter
+        while np.linalg.norm(r) > self.tol:  # start CG method
+
+            self.x = self.x + (r.T @ r) / (d.T @ (self.A @ d)) * d  # update solution
+            delta_old = r.T @ r  # save old squared residual
+            r = self.b - self.A @ self.x  # update residual
+            d = r + (r.T @ r / delta_old) * d  # update search direction
+
             i += 1  # update iteration counter
             if i == self.maxiter:  # convergence criteria
-                self.iters = self.maxiter  # maximum number of iterations needed
                 raise RuntimeError("No convergence.")  # no convergence
-        self.iters = i  # save number of iterations needed
+
+        return self.x
+
+    def cg_winv(self):
+        """
+        Conjugate gradient method with inverse approximation
+
+        Returns
+        -------
+
+        """
+
+        if self.maxiter is None:
+            maxiter = 10 * self.N
+
+        x = np.zeros(self.N)  # initial solution guess
+        C = np.zeros_like(self.A)  # inverse approximation
+        r = self.b - self.A @ x  # initial residual
+        i = 0  # iteration counter
+        while np.linalg.norm(r) > self.tol:  # CG loop
+            r = self.b - self.A @ x  # residual
+            s = r  # action
+            alpha = s.T @ r  # observation
+            d = (np.eye(self.N) - C @ self.A) @ s  # search direction
+            eta = s.T @ (self.A @ d)  # normalization constant
+            C += 1.0 / eta * np.outer(d, d)  # inverse estimate
+            x += alpha / eta * d  # solution estimate
+            i += 1  # update iteration counter
+            if i == maxiter:  # convergence criteria
+                raise RuntimeError("No convergence.")  # no convergence
+
+        return x, C
 
 
 if __name__ == "__main__":
 
-    from time import time
-
+    # fix random seed
     np.random.seed(42)
-    N = 2000
-    A = np.random.rand(N, N)
-    A = A @ A.T
-    b = np.random.rand(N)
 
+    # linear system
+    N = 200
+    K = spd(N)
+    y = np.random.rand(N)
+
+    # solve system
     solver = CG()
-    solver.set_lse(A=A, b=b)
-
-    ta = time()
+    solver.set_lse(A=K, b=y)
     solver.solve()
-    print(time()-ta)
-
-    ta = time()
-    x_scipy = scipy_cg(A, b)
-    print(time() - ta)
