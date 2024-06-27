@@ -1,3 +1,4 @@
+import numpy as np
 from time import time
 from src.kernels.rbf import RBFKernel
 from src.gpr.gaussian_process import GP
@@ -6,6 +7,8 @@ from input.testfuncs_1d import oscillatory_increasing_amplitude
 from src.solver.classic.cg import CG
 from src.solver.classic.chol import Cholesky
 from src.solver.classic.pcg import PCG
+
+np.random.seed(42)
 
 # choose function
 func = oscillatory_increasing_amplitude
