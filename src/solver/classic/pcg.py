@@ -7,20 +7,24 @@ from src.linalg.cholesky import cholesky
 
 class PCG(Solver):
 
-    def __init__(self, rank=None, tol=1e-8):
+    def __init__(self, rank=None, pre_iters=None, tol=1e-8):
         super().__init__()
         self.iters: int = 0
         self.rank = rank
         self.tol = tol
         self.invM = None
         self.P = None
+        self.pre_iters = pre_iters
 
     def solve(self):
         """
         Solve the linear system of equations Ax=b using the conjugate gradient method
         """
 
-        L, _ = cholesky(self.A, p=5, rnd_idx=True)
+        if self.pre_iters is None:
+            self.pre_iters = self.rank
+
+        L, _ = cholesky(self.A, p=self.pre_iters, rnd_idx=True)
 
         self.P = L @ L.T
 

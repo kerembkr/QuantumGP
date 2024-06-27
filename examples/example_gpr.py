@@ -3,10 +3,8 @@ from time import time
 from src.kernels.rbf import RBFKernel
 from src.gpr.gaussian_process import GP
 from src.utils.utils import data_from_func
-from input.testfuncs_1d import oscillatory_increasing_amplitude
-from src.solver.classic.cg import CG
-from src.solver.classic.chol import Cholesky
 from src.solver.classic.pcg import PCG
+from input.testfuncs_1d import oscillatory_increasing_amplitude
 
 np.random.seed(42)
 
@@ -21,10 +19,7 @@ kernel = RBFKernel(theta=[1.0, 1.0])
 eps = 0.1
 
 # choose solver
-# solver = Cholesky(rank=10, rnd_idx=True)
-# solver = CG(rank=10)
-solver = PCG(rank=10)
-# solver = None
+solver = PCG(rank=10, pre_iters=5)
 
 # choose preconditioner
 precon = None
