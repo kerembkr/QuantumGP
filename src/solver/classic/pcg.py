@@ -22,11 +22,10 @@ class PCG(Solver):
         """
 
         if self.pre_iters is None:
-            self.pre_iters = self.rank
-
-        L, _ = cholesky(self.A, p=self.pre_iters, rnd_idx=True)
-
-        self.P = L @ L.T
+            self.P = np.eye(self.N)
+        else:
+            L, _ = cholesky(self.A, p=self.pre_iters, rnd_idx=True)
+            self.P = L @ L.T
 
         self.x, self.invM = pcg_winv(A=self.A,
                                      b=self.b,
