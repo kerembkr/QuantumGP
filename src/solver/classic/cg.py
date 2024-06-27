@@ -28,6 +28,7 @@ class CG(Solver):
 
 
 if __name__ == "__main__":
+
     # fix random seed
     np.random.seed(42)
 
@@ -41,4 +42,5 @@ if __name__ == "__main__":
     solver.set_lse(A=K, b=y)
     x, invK = solver.solve()
 
+    # accuracy
     print(np.linalg.norm(x - np.linalg.solve(K, y)))
