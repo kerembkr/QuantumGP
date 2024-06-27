@@ -1,11 +1,9 @@
-import numpy as np
+from time import time
 from src.kernels.rbf import RBFKernel
 from src.gpr.gaussian_process import GP
 from src.utils.utils import data_from_func
 from input.testfuncs_1d import oscillatory_increasing_amplitude
-from src.solver.solver import Solver
 from src.solver.classic.cg import CG
-from src.solver.classic.pcg import PCG
 from src.solver.classic.chol import Cholesky
 
 # choose function
@@ -19,8 +17,8 @@ kernel = RBFKernel(theta=[1.0, 1.0])
 eps = 0.1
 
 # choose solver
-solver = Cholesky(rank=10, rnd_idx=True)
-# solver = CG()
+# solver = Cholesky(rank=10, rnd_idx=True)
+solver = CG(rank=5)
 # solver = None
 
 # choose preconditioner
@@ -36,10 +34,14 @@ model = GP(kernel=kernel,
            func=func)
 
 # fit
+t0 = time()
 model.fit(X_train, y_train)
+print("time to fit     : {:.4f} sec".format(time()-t0))
 
 # predict
+t0 = time()
 y_mean, y_cov = model.predict(X_test)
+print("time to predict : {:.4f} sec".format(time()-t0))
 
 # plot posterior
 model.plot_gp(X=X_test, mu=y_mean, cov=y_cov, post=True)

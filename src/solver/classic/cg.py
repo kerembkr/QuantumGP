@@ -6,10 +6,10 @@ from src.linalg.conjugate_gradient import cg, cg_winv
 
 class CG(Solver):
 
-    def __init__(self, maxiter=None, tol=1e-8):
+    def __init__(self, rank=None, tol=1e-8):
         super().__init__()
         self.iters: int = 0
-        self.maxiter = maxiter
+        self.rank = rank
         self.tol = tol
         self.invM = None
 
@@ -18,10 +18,9 @@ class CG(Solver):
         Solve the linear system of equations Ax=b using the conjugate gradient method
         """
 
-        # self.x = cg(self.A, self.b)
         self.x, self.invM = cg_winv(A=self.A,
                                     b=self.b,
-                                    maxiter=self.maxiter,
+                                    maxiter=self.rank,
                                     atol=self.tol,
                                     rtol=self.tol)
 

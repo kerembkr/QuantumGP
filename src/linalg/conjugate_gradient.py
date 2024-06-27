@@ -17,12 +17,14 @@ def cg(A, b, maxiter=None, tol=1e-8):
 
     """
 
-    N = len(b)
+    n = len(b)
 
     if maxiter is None:
-        maxiter = 10 * N
+        maxiter = 10 * n
 
-    x = np.zeros(N)                                         # initial solution guess
+
+
+    x = np.zeros(n)                                         # initial solution guess
     r = b - A @ x                                           # initial residual
     d = r.copy()                                            # initial search direction
     i = 0                                                   # iteration counter
@@ -35,7 +37,8 @@ def cg(A, b, maxiter=None, tol=1e-8):
 
         i += 1                                              # update iteration counter
         if i == maxiter:                                    # convergence criteria
-            raise RuntimeError("No convergence.")           # no convergence
+            # raise RuntimeError("No convergence.")           # no convergence
+            return x
 
     return x
 
@@ -76,7 +79,8 @@ def cg_winv(A, b, maxiter=None, rtol=1e-6, atol=1e-6):
         x += alpha / eta * d                        # solution estimate
         i += 1                                      # update iteration counter
         if i == maxiter:                            # convergence criteria
-            raise RuntimeError("No convergence.")   # no convergence
+            # raise RuntimeError("No convergence.")   # no convergence
+            return x, C
 
     return x, C
 
@@ -91,3 +95,5 @@ if __name__ == "__main__":
 
     xsol1 = cg(A_, b_)
     xsol2, invA = cg_winv(A_, b_)
+
+    print(np.linalg.norm(xsol1-np.linalg.solve(A_, b_)))
