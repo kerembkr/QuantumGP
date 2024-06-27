@@ -20,7 +20,8 @@ eps = 0.1
 
 # choose solver
 solver = Cholesky()
-solver = CG()
+# solver = CG()
+solver = None
 
 # choose preconditioner
 precon = None

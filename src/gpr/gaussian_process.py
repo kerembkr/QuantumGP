@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from operator import itemgetter
 from src.utils.utils import save_fig
 from matplotlib.ticker import MaxNLocator
-from scipy.linalg import cholesky
+from scipy.linalg import cholesky, cho_solve, solve_triangular
 from src.utils.acquisition import ExpectedImprovement
 from src.linalg.cholesky import cholesky as cholesky_winv
 
@@ -63,15 +63,16 @@ class GP:
 
         K_[np.diag_indices_from(K_)] += self.alpha_
 
-        # NEW
-        # self.solver.set_lse(A=K_, b=self.y_train)
-        # self.alpha, self.invK = self.solver.solve()
-        self.L, self.invK = cholesky_winv(K_, p=5)
-        self.alpha = self.invK @ self.y_train
-
-        # OLD (CHOLESKY)
-        # self.L = cholesky(K_, lower=True, check_finite=False)  # K_ = L*L^T --> L
-        # self.alpha = cho_solve((self.L, True), self.y_train, check_finite=False)  # alpha = L^T \ (L \ y)
+        if self.solver is not None:
+            # NEW
+            # self.solver.set_lse(A=K_, b=self.y_train)
+            # self.alpha, self.invK = self.solver.solve()
+            self.L, self.invK = cholesky_winv(K_, p=5)
+            self.alpha = self.invK @ self.y_train
+        else:
+            # OLD (CHOLESKY)
+            self.L = cholesky(K_, lower=True, check_finite=False)  # K_ = L*L^T --> L
+            self.alpha = cho_solve((self.L, True), self.y_train, check_finite=False)  # alpha = L^T \ (L \ y)
 
         return self
 
@@ -160,14 +161,12 @@ class GP:
             # MEAN
             y_mean_ = K_trans @ self.alpha
 
-            # NEW
-            # STDDEV
-            y_cov_ = self.kernel(X) - K_trans @ (self.invK @ K_trans.T)
-
-            # OLD
-            # STDDEV
-            # V = solve_triangular(self.L, K_trans.T, lower=True, check_finite=False)
-            # y_cov_ = self.kernel(X) - V.T @ V
+            # inference
+            if self.solver is not None:  # custom solver
+                y_cov_ = self.kernel(X) - K_trans @ (self.invK @ K_trans.T)  # std dev
+            else:  # basic Cholesky
+                V = solve_triangular(self.L, K_trans.T, lower=True, check_finite=False)  # std dev
+                y_cov_ = self.kernel(X) - V.T @ V
 
             return y_mean_, y_cov_
 
@@ -192,20 +191,24 @@ class GP:
         G = K + self.alpha_ * np.eye(self.n)  # add noise
 
         (s, ld) = np.linalg.slogdet(G)  # compute log determinant of symmetric pos.def. matrix
-        # a = np.linalg.solve(G, self.y_train)  # G \\ Y
-        self.solver.set_lse(G, self.y_train)
-        a = self.solver.solve()
+
+        if self.solver is not None:
+            self.solver.set_lse(G, self.y_train)
+            a = self.solver.solve()
+        else:
+            a = np.linalg.solve(G, self.y_train)  # G \\ Y
 
         # log likelihood
         loglik = np.inner(self.y_train, a) + ld  # (Y / G) * Y + log |G|
 
         # gradient
-        dloglik = np.zeros(len(hypers))
-        for i in range(len(hypers)):
-            # dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(np.linalg.solve(G, dK[i]))
-            dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(self.solver.invM @ dK[i])
-
         if eval_gradient:
+            dloglik = np.zeros(len(hypers))
+            for i in range(len(hypers)):
+                if self.solver is not None:
+                    dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(self.solver.invM @ dK[i])
+                else:
+                    dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(np.linalg.solve(G, dK[i]))
             return loglik, dloglik
         else:
             return loglik
