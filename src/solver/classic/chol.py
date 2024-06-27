@@ -18,7 +18,7 @@ class Cholesky(Solver):
         Cholesky Solver
         """
 
-        self.L, self.invM = cholesky(self.A, p=self.rank, rnd_idx=False)    # decompose
+        self.L, self.invM = cholesky(self.A, p=self.rank, rnd_idx=self.rnd_idx)    # decompose
         # self.x = self.cholesky_solve()  # solve
         self.x = self.invM @ self.b
 

@@ -7,7 +7,6 @@ from src.utils.utils import save_fig
 from matplotlib.ticker import MaxNLocator
 from scipy.linalg import cholesky, cho_solve, solve_triangular
 from src.utils.acquisition import ExpectedImprovement
-from src.linalg.cholesky import cholesky as cholesky_winv
 
 
 class GP:
@@ -63,14 +62,10 @@ class GP:
 
         K_[np.diag_indices_from(K_)] += self.alpha_
 
-        if self.solver is not None:
-            # NEW
-            # self.solver.set_lse(A=K_, b=self.y_train)
-            # self.alpha, self.invK = self.solver.solve()
-            self.L, self.invK = cholesky_winv(K_, p=5)
-            self.alpha = self.invK @ self.y_train
-        else:
-            # OLD (CHOLESKY)
+        if self.solver is not None:  # custom solver
+            self.solver.set_lse(A=K_, b=self.y_train)
+            self.alpha = self.solver.solve()
+        else:  # standard Cholesky
             self.L = cholesky(K_, lower=True, check_finite=False)  # K_ = L*L^T --> L
             self.alpha = cho_solve((self.L, True), self.y_train, check_finite=False)  # alpha = L^T \ (L \ y)
 
@@ -163,7 +158,7 @@ class GP:
 
             # inference
             if self.solver is not None:  # custom solver
-                y_cov_ = self.kernel(X) - K_trans @ (self.invK @ K_trans.T)  # std dev
+                y_cov_ = self.kernel(X) - K_trans @ (self.solver.invM @ K_trans.T)  # std dev
             else:  # basic Cholesky
                 V = solve_triangular(self.L, K_trans.T, lower=True, check_finite=False)  # std dev
                 y_cov_ = self.kernel(X) - V.T @ V

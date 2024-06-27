@@ -19,9 +19,9 @@ kernel = RBFKernel(theta=[1.0, 1.0])
 eps = 0.1
 
 # choose solver
-solver = Cholesky()
+solver = Cholesky(rank=10, rnd_idx=True)
 # solver = CG()
-solver = None
+# solver = None
 
 # choose preconditioner
 precon = None
