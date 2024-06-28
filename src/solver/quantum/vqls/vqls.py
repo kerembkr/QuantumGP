@@ -24,6 +24,8 @@ class VQLS(Solver):
         self.stateprep = None
         self.ansatz = None
         self.backend = None
+        self.loss = None
+        self.wopt = None
 
     def solve(self):
 
@@ -34,12 +36,42 @@ class VQLS(Solver):
                                    epochs=self.epochs,
                                    tol=self.tol)
 
+        self.loss = loss_hist
+        self.wopt = wopt
+
         @qml.qnode(qml.device("default.qubit", wires=self.nqubits))
         def prepare_and_sample(weights):
             self.V(weights)
             return qml.state()
 
-        self.x = prepare_and_sample(wopt)
+        self.x = prepare_and_sample(self.wopt)
+
+        return self.x
+
+    def setup(self, optimizer=None, ansatz=None, stateprep=None, backend=None, epochs=100, tol=1e-4):
+
+        self.epochs = epochs
+        self.tol = tol
+
+        if optimizer is None:
+            self.optimizer = GradientDescentQML()
+        else:
+            self.optimizer = optimizer
+
+        if ansatz is None:
+            self.ansatz = StrongEntangling(nqubits=self.nqubits, nlayers=1)
+        else:
+            self.ansatz = ansatz
+
+        if stateprep is None:
+            self.stateprep = AmplitudeEmbedding(wires=range(self.nqubits))
+        else:
+            self.stateprep = stateprep
+
+        if backend is None:
+            self.backend = DefaultQubit(wires=self.nqubits + 1)
+        else:
+            self.backend = backend
 
     def set_lse(self, A, b):
         self.A = A
@@ -68,34 +100,11 @@ class VQLS(Solver):
 
         """
 
-        self.epochs = epochs
-        self.tol = tol
-
-        if optimizer is None:
-            self.optimizer = GradientDescentQML()
-        else:
-            self.optimizer = optimizer
-
-        if ansatz is None:
-            self.ansatz = StrongEntangling(nqubits=self.nqubits, nlayers=1)
-        else:
-            self.ansatz = ansatz
-
-        if stateprep is None:
-            self.stateprep = AmplitudeEmbedding(wires=range(self.nqubits))
-        else:
-            self.stateprep = stateprep
-
-        if backend is None:
-            self.backend = DefaultQubit(wires=self.nqubits + 1)
-        else:
-            self.backend = backend
-
         # initial weights
         w = self.ansatz.init_weights()
 
         # local optimization
-        w, cost_vals, iters = self.optimizer.optimize(func=self.cost, w=w, epochs=epochs, tol=tol)
+        w, cost_vals, iters = self.optimizer.optimize(func=self.cost, w=w, epochs=self.epochs, tol=self.tol)
 
         return w, cost_vals
 

@@ -32,12 +32,13 @@ ansatz_ = StrongEntangling(nqubits=nqubits, nlayers=nlayers)
 prep_ = MottonenStatePrep(wires=range(nqubits))
 backend_ = DefaultQubit(wires=nqubits + 1)
 
-wopt1, loss1 = solver1.opt(optimizer=optim_, ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter,
-                           tol=1e-6)
-wopt2, loss2 = solver2.opt(optimizer=optim_, ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter,
-                           epochs_bo=10, tol=1e-6)
+solver1.setup(optimizer=optim_, ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, tol=1e-5)
+solver2.setup(optimizer=optim_, ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, epochs_bo=10, tol=1e-5)
 
-losses = {"VQLS": loss1, "FastSlowVQLS": loss2}
+xopt1 = solver1.solve()
+xopt2 = solver2.solve()
+
+losses = {"VQLS": solver1.loss, "FastSlowVQLS": solver2.loss}
 
 title = "qubits = {:d}    layers = {:d}".format(nqubits, nlayers)
 plot_costs(data=losses, save_png=True, title=title, fname="test")

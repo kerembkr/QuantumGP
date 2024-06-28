@@ -9,24 +9,13 @@ from src.solver.quantum.vqls.vqls import VQLS
 class FastSlowVQLS(VQLS):
     def __init__(self):
         super().__init__()
+        self.epochs_bo = None
 
-    def opt(self, optimizer=None, ansatz=None, stateprep=None, backend=None, epochs=100, epochs_bo=None, tol=1e-4):
-        """
+    def setup(self, optimizer=None, ansatz=None, stateprep=None, backend=None, epochs=100, epochs_bo=None, tol=1e-4):
 
-        Parameters
-        ----------
-        optimizer
-        ansatz
-        stateprep
-        backend
-        epochs
-        epochs_bo
-        tol
-
-        Returns
-        -------
-
-        """
+        self.epochs = epochs
+        self.epochs_bo = epochs_bo
+        self.tol = tol
 
         if optimizer is None:
             self.optimizer = GradientDescentQML()
@@ -48,15 +37,33 @@ class FastSlowVQLS(VQLS):
         else:
             self.backend = backend
 
+    def opt(self, optimizer=None, ansatz=None, stateprep=None, backend=None, epochs=100, epochs_bo=None, tol=1e-4):
+        """
+
+        Parameters
+        ----------
+        optimizer
+        ansatz
+        stateprep
+        backend
+        epochs
+        epochs_bo
+        tol
+
+        Returns
+        -------
+
+        """
+
         # initial weights
         w = self.ansatz.init_weights()
 
         # global optimization
-        if epochs_bo is not None:
-            w, _ = self.bayesopt_init(epochs_bo=epochs_bo)
+        if self.epochs_bo is not None:
+            w, _ = self.bayesopt_init(epochs_bo=self.epochs_bo)
 
         # local optimization
-        w, cost_vals, iters = self.optimizer.optimize(func=self.cost, w=w, epochs=epochs, tol=tol)
+        w, cost_vals, iters = self.optimizer.optimize(func=self.cost, w=w, epochs=self.epochs, tol=self.tol)
 
         return w, cost_vals
 
