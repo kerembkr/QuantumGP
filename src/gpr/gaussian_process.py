@@ -285,7 +285,7 @@ class GP:
             ax1 = fig.add_subplot(121)
             ax2 = fig.add_subplot(122)
         else:
-            fig = plt.figure(figsize=(6, 5))
+            fig = plt.figure(figsize=(7, 4))
             ax1 = fig.add_subplot(111)
 
         # Always plot the posterior
