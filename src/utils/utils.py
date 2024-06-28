@@ -67,7 +67,7 @@ def save_fig(name):
         filename = name[1]
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    plt.savefig(os.path.join(output_dir, filename + ".png"), dpi=300)
+    plt.savefig(os.path.join(output_dir, filename + ".png"), dpi=100)
 
 
 def get_paulis(mat):

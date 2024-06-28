@@ -4,6 +4,7 @@ from src.kernels.rbf import RBFKernel
 from src.gpr.gaussian_process import GP
 from src.utils.utils import data_from_func
 from src.solver.classic.pcg import PCG
+from src.solver.classic.cg import CG
 from input.testfuncs_1d import oscillatory_increasing_amplitude
 
 # fix random seed
@@ -26,6 +27,7 @@ eps = 0.1
 
 # choose solver
 solver = PCG(rank=rank, pre_iters=pre_iters)
+# solver = CG(rank=rank)
 
 # choose preconditioner
 precon = None
