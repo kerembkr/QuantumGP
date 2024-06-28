@@ -6,13 +6,14 @@ import pennylane as qml
 import pennylane.numpy as np
 import matplotlib.pyplot as plt
 
-n = 2  # qubits
-L = 1  # layers
+n = 3  # qubits
+L = 3  # layers
 ni = 4  # features
 
 # linear system Ax=b
 A = np.random.rand(2 ** n, 2 ** n)
 A = A @ A.T
+A = np.eye(2**n)
 b = np.ones(2 ** n)
 
 
@@ -42,13 +43,8 @@ def V(weights):
 
     """
 
-    # for i in range(n):
-    #     qml.Hadamard(wires=i)
-
-    # for i in range(n):
-    #     qml.RY(weights[i], wires=i)
-
-    qml.BasicEntanglerLayers(weights, wires=range(n), rotation=None, id=None)
+    # qml.BasicEntanglerLayers(weights, wires=range(n), rotation=None, id=None)
+    qml.StronglyEntanglingLayers(weights, wires=range(n))
 
 
 def get_paulis(A):
@@ -155,7 +151,9 @@ class HybridNeuralNetwork(nn.Module):
         # classical layers
         self.lin1 = nn.Linear(self.ninputs, 8)
         self.lin2 = nn.Linear(8, 8)
-        self.lin3 = nn.Linear(8, self.nqubits)
+        # self.lin3 = nn.Linear(8, self.nqubits)
+        self.lin3 = nn.Linear(8, self.nqubits*self.nlayers*3)
+
         self.relu = nn.ReLU()
         self.tanh = nn.Tanh()
 
@@ -190,7 +188,8 @@ class HybridNeuralNetwork(nn.Module):
         y = self.lin3(y)
         # y = self.tanh(y)
         # y = torch.reshape(y, (self.nqubits,))
-        y = torch.reshape(y, (1, self.nqubits))
+        # y = torch.reshape(y, (1, self.nqubits))
+        y = torch.reshape(y, (self.nlayers, self.nqubits, 3))
 
         # use output of the DNN for every VQC
         outputs = {}
@@ -269,7 +268,7 @@ def optimize():
 
     maxiter = 200  # max iterations
     tol = 0.001  # threshold
-    eta = 1.0  # learning rate
+    eta = 0.1  # learning rate
 
     # List to save data
     cost_hist = []
