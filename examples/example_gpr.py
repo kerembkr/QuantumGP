@@ -6,11 +6,17 @@ from src.utils.utils import data_from_func
 from src.solver.classic.pcg import PCG
 from input.testfuncs_1d import oscillatory_increasing_amplitude
 
+# fix random seed
 np.random.seed(42)
+
+n_train = 30  # training points
+n_test = 500  # testing points
+pre_iters = 10  # preconditioning steps
+rank = 20  # solver iterations
 
 # choose function
 func = oscillatory_increasing_amplitude
-X_train, X_test, y_train = data_from_func(f=func, N=30, M=500, xx=[0.0, 4.0, -2.0, 6.0], noise=0.1)
+X_train, X_test, y_train = data_from_func(f=func, N=n_train, M=n_test, xx=[0.0, 4.0, -2.0, 6.0], noise=0.1)
 
 # choose kernel
 kernel = RBFKernel(theta=[1.0, 1.0])
@@ -19,7 +25,7 @@ kernel = RBFKernel(theta=[1.0, 1.0])
 eps = 0.1
 
 # choose solver
-solver = PCG(rank=10, pre_iters=5)
+solver = PCG(rank=rank, pre_iters=pre_iters)
 
 # choose preconditioner
 precon = None
