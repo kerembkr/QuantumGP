@@ -275,7 +275,8 @@ class GP:
         plt.legend()
         # save sample plots
         if save_png:
-            save_fig("samples")
+            # save_fig("samples")
+            save_fig(["gpr", "samples"])
 
     def plot_gp(self, X, mu, cov, post=False, plot_acq=False):
 
@@ -326,6 +327,9 @@ class GP:
         plt.tight_layout()
 
         if post:
-            save_fig("gp" + "_" + str(len(self.X_train)))
+            # save_fig("gp" + "_" + str(len(self.X_train)))
+            save_fig(["gpr", "gp" + "_" + str(len(self.X_train))])
         else:
-            save_fig("gp_0")
+            # save_fig("gp_0")
+            save_fig(["gpr", "gp_0"])
+

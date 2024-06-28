@@ -62,9 +62,12 @@ def data_from_func(f, N, M, xx, noise=0.1, rand=False):
 
 def save_fig(name):
     output_dir = '/Users/kerembuekrue/Documents/code/QuantumGP/output/'
+    if len(name) > 1:
+        output_dir += name[0]
+        filename = name[1]
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    plt.savefig(os.path.join(output_dir, name + ".png"), dpi=300)
+    plt.savefig(os.path.join(output_dir, filename + ".png"), dpi=300)
 
 
 def get_paulis(mat):

@@ -53,4 +53,6 @@ def plot_costs(data, save_png=False, title=None, log=False, fname=None):
         ax.set_title(title, fontsize=18, fontname='serif')
 
     if save_png:
-        save_fig(fname)
+        # save_fig(fname)
+        save_fig(["vqls/", fname])
+

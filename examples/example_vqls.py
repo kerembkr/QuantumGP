@@ -13,7 +13,7 @@ np.random.seed(42)
 nqubits = 1
 nlayers = 2
 
-maxiter = 100
+maxiter = 5
 
 # init
 solver = VQLS()
@@ -53,7 +53,7 @@ for optim in optims:
     wopts[optim.name] = wopt
 
 title = "VQLS   {:s}    qubits = {:d}    layers = {:d}".format(ansatz_.__class__.__name__, nqubits, nlayers)
-plot_costs(data=cost_hists, save_png=True, title=title, fname="loss_vqls")
+plot_costs(data=cost_hists, save_png=True, title=title, fname="loss")
 
 device_probs = LightningQubit(wires=nqubits, shots=10000)
 

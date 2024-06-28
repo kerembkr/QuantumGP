@@ -332,4 +332,6 @@ class VQLS(Solver):
                 axs[i, 0].set_xticklabels([])
                 axs[i, 1].set_xticklabels([])
 
-        utils.save_fig("probs")
+        # utils.save_fig("vqls/probs")
+        utils.save_fig(["vqls/", "probs"])
+
