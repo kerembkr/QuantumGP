@@ -26,7 +26,11 @@ def pcg(A, b, maxiter=None, rtol=1e-6, atol=1e-6, P=None):
     if P is None:
         P = np.eye(n)
 
-    invP = mat_inv_lemma(np.eye(n), P, np.eye(n), np.eye(n))
+    # compute inverse using matrix inversion lemma
+    invP = mat_inv_lemma(A=np.eye(n) * 0.1**2,
+                         U=P,
+                         C=np.eye(np.shape(P)[1]),
+                         V=P)
 
     x = np.zeros(n)  # initial solution guess
     C = np.zeros_like(A)  # inverse approximation
@@ -50,6 +54,29 @@ def pcg(A, b, maxiter=None, rtol=1e-6, atol=1e-6, P=None):
 
 
 def mat_inv_lemma(A, U, C, V):
+    """
+    Compute the inverse of a matrix using the matrix inversion lemma (Woodbury matrix identity).
+
+    The matrix inversion lemma is used to compute the inverse of a matrix of the form:
+    (A + UCV^T)^-1.
+
+    Parameters
+    ----------
+    A (np.ndarray): A square matrix of size (n, n).
+    U (np.ndarray): A matrix of size (n, k).
+    C (np.ndarray): A square matrix of size (k, k).
+    V (np.ndarray): A matrix of size (n, k).
+
+    Returns
+    -------
+    np.ndarray: The inverse of the matrix (A + UCV^T).
+
+    Notes
+    -----
+    The matrix inversion lemma states that:
+    (A + UCV^T)^-1 = A^-1 - A^-1 * U * (C^-1 + V^T * A^-1 * U)^-1 * V^T * A^-1.
+
+    """
 
     invA = np.linalg.inv(A)
     invC = np.linalg.inv(C)

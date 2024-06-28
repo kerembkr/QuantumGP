@@ -24,8 +24,8 @@ class PCG(Solver):
         if self.pre_iters is None:
             self.P = np.eye(self.N)
         else:
-            L, _ = cholesky(self.A, p=self.pre_iters, rnd_idx=True)
-            self.P = L @ L.T
+            L, _ = cholesky(self.A, p=self.pre_iters, rnd_idx=False)  # preconditioning matrix
+            self.P = L[:, :self.pre_iters]
 
         self.x, self.invM = pcg(A=self.A,
                                 b=self.b,
