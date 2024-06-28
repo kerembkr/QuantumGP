@@ -84,7 +84,8 @@ def get_paulis(mat):
       """
 
     # decompose
-    pauli_matrix = qml.pauli_decompose(mat, check_hermitian=True, pauli=False)
+    # pauli_matrix = qml.pauli_decompose(mat, check_hermitian=True, pauli=False)
+    pauli_matrix = qml.pauli_decompose(mat, check_hermitian=False, pauli=False)
 
     # get coefficients and operators
     coeffs = pauli_matrix.coeffs

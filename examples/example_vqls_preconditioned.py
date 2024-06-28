@@ -12,17 +12,17 @@ from src.linalg.preconditioned_conjugate_gradient import mat_inv_lemma
 np.random.seed(42)
 
 # number of qubits & layers
-nqubits = 1
-nlayers = 1
+nqubits = 2
+nlayers = 2
 
 # maximum number of iterations
 maxiter = 100
 
 # random symmetric positive definite matrix
-A0, b0 = get_random_ls(nqubits, easy_example=False)
+A0, b0 = get_random_ls(nqubits, easy_example=True)
 
-L, _ = cholesky(A=A0, p=2, rnd_idx=True)  # preconditioning matrix
-P = L[:, :2]
+L, _ = cholesky(A=A0, p=2**nqubits, rnd_idx=True)  # preconditioning matrix
+P = L[:, :2**nqubits]
 
 # compute inverse using matrix inversion lemma
 invP = mat_inv_lemma(A=np.eye(2**nqubits) * 0.1**2,
@@ -32,6 +32,7 @@ invP = mat_inv_lemma(A=np.eye(2**nqubits) * 0.1**2,
 
 A0p = invP @ A0
 b0p = invP @ b0
+
 
 print(np.linalg.cond(A0))
 print(np.linalg.cond(A0p))
@@ -43,7 +44,7 @@ solver2 = VQLS()
 solver2.set_lse(A=A0p, b=b0p)
 
 # choose optimizer, ansatz, state preparation, backend
-optim_ = AdamQML()
+optim_ = NesterovMomentumQML()
 ansatz_ = StrongEntangling(nqubits=nqubits, nlayers=nlayers)
 prep_ = MottonenStatePrep(wires=range(nqubits))
 backend_ = DefaultQubit(wires=nqubits + 1)

@@ -10,10 +10,10 @@ from src.utils.plotting import plot_costs
 np.random.seed(42)
 
 # number of qubits & layers
-nqubits = 1
+nqubits = 2
 nlayers = 2
 
-maxiter = 5
+maxiter = 100
 
 # init
 solver = VQLS()
