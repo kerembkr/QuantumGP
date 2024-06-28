@@ -11,9 +11,9 @@ np.random.seed(42)
 
 # number of qubits & layers
 nqubits = 1
-nlayers = 1
+nlayers = 2
 
-maxiter = 20
+maxiter = 100
 
 # init
 solver = VQLS()

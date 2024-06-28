@@ -10,16 +10,18 @@ from src.utils.plotting import plot_costs
 np.random.seed(42)
 
 # number of qubits & layers
-nqubits = 2
-nlayers = 3
+nqubits = 1
+nlayers = 2
 
-maxiter = 200
+maxiter = 100
 
 # random symmetric positive definite matrix
-A0, b0 = get_random_ls(nqubits, easy_example=True)
+A0, b0 = get_random_ls(nqubits, easy_example=False)
 
 # init
-solver = FastSlowVQLS(A=A0, b=b0)
+# solver = FastSlowVQLS(A=A0, b=b0)
+solver = FastSlowVQLS()
+solver.set_lse(A=A0, b=b0)
 
 # choose optimizer
 optims = [GradientDescentQML(),

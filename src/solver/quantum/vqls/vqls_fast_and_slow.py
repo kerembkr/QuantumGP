@@ -7,8 +7,8 @@ from src.solver.quantum.vqls.vqls import VQLS
 
 
 class FastSlowVQLS(VQLS):
-    def __init__(self, A, b):
-        super().__init__(A, b)
+    def __init__(self):
+        super().__init__()
 
     def opt(self, optimizer=None, ansatz=None, stateprep=None, backend=None, epochs=100, epochs_bo=None, tol=1e-4):
         """
