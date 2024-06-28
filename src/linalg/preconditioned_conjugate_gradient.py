@@ -3,20 +3,49 @@ import numpy as np
 
 def pcg(A, b, maxiter=None, rtol=1e-6, atol=1e-6, P=None):
     """
-    Conjugate gradient method
+    Preconditioned Conjugate Gradient (PCG) method for solving a linear system Ax = b.
 
     Parameters
     ----------
-    P
-    atol
-    rtol
-    A
-    b
-    maxiter
+    A : np.ndarray
+        The matrix representing the linear system, of size (n, n).
+    b : np.ndarray
+        The right-hand side vector of the linear system, of size (n,).
+    maxiter : int, optional
+        The maximum number of iterations allowed. Default is 10 * n.
+    rtol : float, optional
+        The relative tolerance for convergence. Default is 1e-6.
+    atol : float, optional
+        The absolute tolerance for convergence. Default is 1e-6.
+    P : np.ndarray, optional
+        The preconditioner matrix, of size (n, p). If None, the identity matrix is used. Default is None.
 
     Returns
     -------
+    x : np.ndarray
+        The approximate solution to the linear system, of size (n,).
+    C : np.ndarray
+        The approximation of the inverse of A, of size (n, n).
 
+    Notes
+    -----
+    - The function uses the matrix inversion lemma to compute the preconditioner inverse.
+    - The PCG method is useful for solving large, sparse, symmetric positive-definite systems efficiently.
+    - This implementation assumes the preconditioner P is used to improve convergence.
+
+    Example
+    -------
+    ```
+    n = 5  # Example size of the matrix
+    A = np.random.randn(n, n)
+    A = A.T @ A  # Make A symmetric positive-definite
+    b = np.random.randn(n)
+    P = np.random.randn(n, 3)  # Example preconditioner with rank 3
+
+    x, C = pcg(A, b, P=P)
+    print("Solution:", x)
+    print("Inverse Approximation:", C)
+    ```
     """
 
     n = len(b)
