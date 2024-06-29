@@ -57,8 +57,6 @@ class HybridNeuralNetwork(nn.Module):
         y = self.lin2(y)
         y = self.tanh(y)
         y = self.lin3(y)
-        # y = self.tanh(y)
-        # y = torch.reshape(y, (self.nqubits,))
         y = torch.reshape(y, (1, self.nqubits))
 
         # use output of the DNN for every VQC
