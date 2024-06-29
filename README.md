@@ -9,13 +9,9 @@ Quantum Solvers
 
 Classical Solvers
 - Cholesky
+- Partial Cholesky
 - Conjugate Gradient (CG)
 - Preconditioned Conjugate Gradient (PCG)
 
-Decomposition
-- LU
-- Cholesky
-
 Preconditioners
-- Incomplete LU
-- Incomplete Cholesky
+- Partial Cholesky
