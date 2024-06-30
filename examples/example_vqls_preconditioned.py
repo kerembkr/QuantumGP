@@ -33,28 +33,32 @@ invP = mat_inv_lemma(A=np.eye(2**nqubits) * 0.1**2,
 A0p = invP @ A0
 b0p = invP @ b0
 
-
 print(np.linalg.cond(A0))
 print(np.linalg.cond(A0p))
 
 # init
 solver1 = VQLS()
-solver1.set_lse(A=A0, b=b0)
 solver2 = VQLS()
+
+# set linear system
+solver1.set_lse(A=A0, b=b0)
 solver2.set_lse(A=A0p, b=b0p)
 
 # choose optimizer, ansatz, state preparation, backend
 optim_ = NesterovMomentumQML()
-ansatz_ = StrongEntangling(nqubits=nqubits, nlayers=nlayers)
+ansatz_ = HardwareEfficient(nqubits=nqubits, nlayers=nlayers)
 prep_ = MottonenStatePrep(wires=range(nqubits))
 backend_ = DefaultQubit(wires=nqubits + 1)
 
-wopt1, loss1 = solver1.opt(optimizer=optim_, ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter,
-                           tol=1e-6)
-wopt2, loss2 = solver2.opt(optimizer=optim_, ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter,
-                           tol=1e-6)
+# setup
+solver1.setup(optimizer=optim_, ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, tol=1e-5)
+solver2.setup(optimizer=optim_, ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, tol=1e-5)
 
-losses = {"VQLS": loss1, "VQLS with PC": loss2}
+# solve
+xopt1 = solver1.solve()
+xopt2 = solver2.solve()
+
+losses = {"VQLS": solver1.loss, "VQLS with PC": solver2.loss}
 
 title = "qubits = {:d}    layers = {:d}".format(nqubits, nlayers)
 plot_costs(data=losses, save_png=True, title=title, fname="vqls_precon")
