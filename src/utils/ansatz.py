@@ -27,13 +27,23 @@ class HardwareEfficient(Ansatz):
         super().__init__(nqubits, nlayers)
 
     def vqc(self, weights):
-        raise NotImplementedError("Not implemented yet.")
+
+        for i in range(self.nqubits):
+            qml.RY(weights[i, 0], wires=i)
+
+        for l in range(self.nlayers):
+            for j in range(self.nqubits-1):
+                qml.CZ(wires=[l, j+1])
+            for k in range(self.nqubits):
+                qml.RY(weights[k, 1+l], wires=k)
 
     def init_weights(self):
-        raise NotImplementedError("Not implemented yet.")
+        self.nweights = self.nqubits * (1 + self.nlayers)
+        w = np.random.randn(self.nweights, requires_grad=True)
+        return np.reshape(w, (self.nqubits, 1 + self.nlayers))
 
     def prep_weights(self, w):
-        pass
+        return np.reshape(w, (self.nqubits, 1 + self.nlayers))
 
 
 class StrongEntangling(Ansatz):
