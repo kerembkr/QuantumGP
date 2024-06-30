@@ -1,8 +1,8 @@
-from src.utils.ansatz import BasicEntangling, StrongEntangling, RotY, HardwareEfficient
-from src.utils.embedding import AmplitudeEmbedding, MottonenStatePrep
+from src.utils.ansatz import HardwareEfficient
+from src.utils.embedding import MottonenStatePrep
 from src.optimizers.optim_qml import (GradientDescentQML, AdamQML, AdagradQML, MomentumQML, NesterovMomentumQML,
                                       RMSPropQML)
-from src.utils.backend import DefaultQubit, LightningQubit
+from src.utils.backend import DefaultQubit
 from src.utils.utils import get_random_ls
 from src.solver.quantum.vqls.vqls import VQLS
 from src.utils.plotting import plot_costs
@@ -32,7 +32,7 @@ optims = [GradientDescentQML(),
           NesterovMomentumQML(),
           RMSPropQML()]
 
-# ansatz_ = StrongEntangling(nqubits=nqubits, nlayers=nlayers)
+# choose ansatz, state preparation, backend
 ansatz_ = HardwareEfficient(nqubits=nqubits, nlayers=nlayers)
 prep_ = MottonenStatePrep(wires=range(nqubits))
 backend_ = DefaultQubit(wires=nqubits + 1)
