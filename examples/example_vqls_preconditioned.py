@@ -58,7 +58,8 @@ solver2.setup(optimizer=optim_, ansatz=ansatz_, stateprep=prep_, backend=backend
 xopt1 = solver1.solve()
 xopt2 = solver2.solve()
 
-losses = {"VQLS": solver1.loss, "VQLS with PC": solver2.loss}
+losses = {"VQLS": solver1.loss,
+          "VQLS with PC": solver2.loss}
 
 title = "qubits = {:d}    layers = {:d}".format(nqubits, nlayers)
 plot_costs(data=losses, save_png=True, title=title, fname="vqls_precon")

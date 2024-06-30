@@ -33,7 +33,7 @@ class HardwareEfficient(Ansatz):
 
         for l in range(self.nlayers):
             for j in range(self.nqubits-1):
-                qml.CZ(wires=[l, j+1])
+                qml.CZ(wires=[j, j+1])
             for k in range(self.nqubits):
                 qml.RY(weights[k, 1+l], wires=k)
 
