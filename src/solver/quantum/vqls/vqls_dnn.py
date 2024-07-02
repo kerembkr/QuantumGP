@@ -14,14 +14,14 @@ class DeepVQLS(VQLS):
         for l in range(lenc):
             for lp in range(lenc):
                 # psi
-                qn_re_psi = qlayer(n=n, l=l, lp=lp, j=-1, part="Re")
-                qn_im_psi = qlayer(n=n, l=l, lp=lp, j=-1, part="Im")
+                qn_re_psi = self.qlayer(n=n, l=l, lp=lp, j=-1, part="Re")
+                qn_im_psi = self.qlayer(n=n, l=l, lp=lp, j=-1, part="Im")
                 qnode_dict[(l, lp, -1, "Re")] = qn_re_psi
                 qnode_dict[(l, lp, -1, "Im")] = qn_im_psi
                 for j in range(n):
                     # mu
-                    qn_re_mu = qlayer(n=n, l=l, lp=lp, j=j, part="Re")
-                    qn_im_mu = qlayer(n=n, l=l, lp=lp, j=j, part="Im")
+                    qn_re_mu = self.qlayer(n=n, l=l, lp=lp, j=j, part="Re")
+                    qn_im_mu = self.qlayer(n=n, l=l, lp=lp, j=j, part="Im")
                     qnode_dict[(l, lp, j, "Re")] = qn_re_mu
                     qnode_dict[(l, lp, j, "Im")] = qn_im_mu
 
@@ -72,6 +72,13 @@ class DeepVQLS(VQLS):
         _, opti_mopti = model(x)
         return cost_hist, opti_mopti, -1
 
+        # initial weights
+        w = self.ansatz.init_weights()
+
+        # local optimization
+        w, cost_vals, iters = self.optimizer.optimize(func=self.cost, w=w, epochs=self.epochs, tol=self.tol)
+
+        return w, cost_vals
 
 
 class HybridNeuralNetwork(nn.Module):
