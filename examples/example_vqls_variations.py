@@ -1,4 +1,4 @@
-from src.utils.ansatz import *
+from src.utils.ansatz import HardwareEfficient
 from src.utils.embedding import *
 from src.optimizers.optim_qml import *
 from src.utils.backend import DefaultQubit
@@ -33,7 +33,7 @@ solver3.set_lse(A=A0, b=b0)
 
 # choose optimizer, ansatz, state preparation, backend
 optim_ = AdamQML()
-ansatz_ = StrongEntangling(nqubits=nqubits, nlayers=nlayers)
+ansatz_ = HardwareEfficient(nqubits=nqubits, nlayers=nlayers)
 prep_ = MottonenStatePrep(wires=range(nqubits))
 backend_ = DefaultQubit(wires=nqubits + 1)
 
