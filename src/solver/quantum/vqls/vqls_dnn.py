@@ -9,6 +9,70 @@ class DeepVQLS(VQLS):
     def __init__(self):
         super().__init__()
 
+    def create_qnodes(self, n, lenc, qlayer):
+        qnode_dict = {}
+        for l in range(lenc):
+            for lp in range(lenc):
+                # psi
+                qn_re_psi = qlayer(n=n, l=l, lp=lp, j=-1, part="Re")
+                qn_im_psi = qlayer(n=n, l=l, lp=lp, j=-1, part="Im")
+                qnode_dict[(l, lp, -1, "Re")] = qn_re_psi
+                qnode_dict[(l, lp, -1, "Im")] = qn_im_psi
+                for j in range(n):
+                    # mu
+                    qn_re_mu = qlayer(n=n, l=l, lp=lp, j=j, part="Re")
+                    qn_im_mu = qlayer(n=n, l=l, lp=lp, j=j, part="Im")
+                    qnode_dict[(l, lp, j, "Re")] = qn_re_mu
+                    qnode_dict[(l, lp, j, "Im")] = qn_im_mu
+
+        return qnode_dict
+
+    def opt(self, optimizer=None, ansatz=None, stateprep=None, backend=None, epochs=100, tol=1e-4):
+
+        # init hybrid model
+        qlayers = self.create_qnodes(n, len(c), qlayer)
+
+        model = HybridNeuralNetwork(qnode=qlayers, nqubits=n, nlayers=L, ninputs=ni, npaulis=len(c))
+
+        maxiter = 200  # max iterations
+        tol = 0.001  # threshold
+        eta = 0.1  # learning rate
+
+        # List to save data
+        cost_hist = []
+
+        # features
+        x = torch.ones(ni) * (np.pi / 4)
+
+        # Optimizer
+        opt = torch.optim.SGD(model.parameters(), lr=eta)
+
+        for i in range(maxiter):
+
+            # track time
+            t0 = time()
+
+            opt.zero_grad()  # init gradient
+            out, _ = model(x)  # forward pass
+            loss = cost(out)  # compute loss
+            loss.backward()  # backpropagation
+            opt.step()  # update weights
+
+            # save cost function value
+            cost_hist.append(loss.item())
+
+            # print information
+            if i % 1 == 0:
+                print("iter {:4d}    cost  {:.5f}    time  {:.4f}".format(i, loss, time() - t0))
+
+            if loss.item() < tol:  # breaking condition
+                print("\nOptimum found after {:3d} Steps!".format(i))
+                _, opti_mopti = model(x)
+                return cost_hist, opti_mopti, 0
+        _, opti_mopti = model(x)
+        return cost_hist, opti_mopti, -1
+
+
 
 class HybridNeuralNetwork(nn.Module):
 
