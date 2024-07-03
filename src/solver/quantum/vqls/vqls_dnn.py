@@ -9,19 +9,19 @@ class DeepVQLS(VQLS):
     def __init__(self):
         super().__init__()
 
-    def create_qnodes(self, n, lenc, qlayer):
+    def create_qnodes(self):
         qnode_dict = {}
-        for l in range(lenc):
-            for lp in range(lenc):
+        for l in range(len(self.c)):
+            for lp in range(len(self.c)):
                 # psi
-                qn_re_psi = self.qlayer(n=n, l=l, lp=lp, j=-1, part="Re")
-                qn_im_psi = self.qlayer(n=n, l=l, lp=lp, j=-1, part="Im")
+                qn_re_psi = self.qlayer(l=l, lp=lp, j=-1, part="Re")
+                qn_im_psi = self.qlayer(l=l, lp=lp, j=-1, part="Im")
                 qnode_dict[(l, lp, -1, "Re")] = qn_re_psi
                 qnode_dict[(l, lp, -1, "Im")] = qn_im_psi
-                for j in range(n):
+                for j in range(self.n):
                     # mu
-                    qn_re_mu = self.qlayer(n=n, l=l, lp=lp, j=j, part="Re")
-                    qn_im_mu = self.qlayer(n=n, l=l, lp=lp, j=j, part="Im")
+                    qn_re_mu = self.qlayer(l=l, lp=lp, j=j, part="Re")
+                    qn_im_mu = self.qlayer(l=l, lp=lp, j=j, part="Im")
                     qnode_dict[(l, lp, j, "Re")] = qn_re_mu
                     qnode_dict[(l, lp, j, "Im")] = qn_im_mu
 
@@ -30,9 +30,11 @@ class DeepVQLS(VQLS):
     def opt(self, optimizer=None, ansatz=None, stateprep=None, backend=None, epochs=100, tol=1e-4):
 
         # init hybrid model
-        qlayers = self.create_qnodes(n, len(c), qlayer)
+        qlayers = self.create_qnodes()
 
-        model = HybridNeuralNetwork(qnode=qlayers, nqubits=n, nlayers=L, ninputs=ni, npaulis=len(c))
+        ni = 4
+
+        model = HybridNeuralNetwork(qnode=qlayers, nqubits=n, nlayers=self.nlayers, ninputs=ni, npaulis=len(c))
 
         maxiter = 200  # max iterations
         tol = 0.001  # threshold

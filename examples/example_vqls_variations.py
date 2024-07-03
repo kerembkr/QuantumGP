@@ -16,7 +16,7 @@ nqubits = 1
 nlayers = 1
 
 # maximum number of iterations
-maxiter = 200
+maxiter = 20
 
 # random symmetric positive definite matrix
 A0, b0 = get_random_ls(nqubits, easy_example=False)
