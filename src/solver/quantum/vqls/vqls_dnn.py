@@ -18,7 +18,7 @@ class DeepVQLS(VQLS):
                 qn_im_psi = self.qlayer(l=l, lp=lp, j=-1, part="Im")
                 qnode_dict[(l, lp, -1, "Re")] = qn_re_psi
                 qnode_dict[(l, lp, -1, "Im")] = qn_im_psi
-                for j in range(self.n):
+                for j in range(self.nqubits):
                     # mu
                     qn_re_mu = self.qlayer(l=l, lp=lp, j=j, part="Re")
                     qn_im_mu = self.qlayer(l=l, lp=lp, j=j, part="Im")
@@ -34,7 +34,8 @@ class DeepVQLS(VQLS):
 
         ni = 4
 
-        model = HybridNeuralNetwork(qnode=qlayers, nqubits=n, nlayers=self.nlayers, ninputs=ni, npaulis=len(c))
+        model = HybridNeuralNetwork(qnode=qlayers, nqubits=self.nqubits, nlayers=self.ansatz.nlayers, ninputs=ni,
+                                    npaulis=len(self.c))
 
         maxiter = 200  # max iterations
         tol = 0.001  # threshold
@@ -52,11 +53,9 @@ class DeepVQLS(VQLS):
         for i in range(maxiter):
 
             # track time
-            t0 = time()
-
             opt.zero_grad()  # init gradient
             out, _ = model(x)  # forward pass
-            loss = cost(out)  # compute loss
+            loss = self.cost(out)  # compute loss
             loss.backward()  # backpropagation
             opt.step()  # update weights
 
@@ -65,7 +64,7 @@ class DeepVQLS(VQLS):
 
             # print information
             if i % 1 == 0:
-                print("iter {:4d}    cost  {:.5f}    time  {:.4f}".format(i, loss, time() - t0))
+                print("iter {:4d}    cost  {:.5f}".format(i, loss))
 
             if loss.item() < tol:  # breaking condition
                 print("\nOptimum found after {:3d} Steps!".format(i))
