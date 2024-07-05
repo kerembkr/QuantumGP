@@ -57,4 +57,4 @@ print("xopt3", xopt3)
 # plot loss functions
 losses = {"VQLS": solver1.loss, "FastSlowVQLS": solver2.loss, "DeepVQLS": solver3.loss}
 title = "qubits = {:d}    layers = {:d}".format(nqubits, nlayers)
-plot_costs(data=losses, save_png=True, title=title, fname="test")
+plot_costs(data=losses, save_png=True, title=title, fname="vqls_fastslowvqls_deepvqls")
