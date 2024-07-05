@@ -37,47 +37,11 @@ class DeepVQLS(VQLS):
         model = HybridNeuralNetwork(qnode=qlayers, nqubits=self.nqubits, nlayers=self.ansatz.nlayers, ninputs=ni,
                                     npaulis=len(self.c))
 
-        maxiter = 200  # max iterations
-        tol = 0.001  # threshold
-        eta = 0.1  # learning rate
-
-        # List to save data
-        cost_hist = []
-
-        # features
-        x = torch.ones(ni) * (np.pi / 4)
-
-        # Optimizer
-        opt = torch.optim.SGD(model.parameters(), lr=eta)
-
-        for i in range(maxiter):
-
-            # track time
-            opt.zero_grad()  # init gradient
-            out, _ = model(x)  # forward pass
-            loss = self.cost(out)  # compute loss
-            loss.backward()  # backpropagation
-            opt.step()  # update weights
-
-            # save cost function value
-            cost_hist.append(loss.item())
-
-            # print information
-            if i % 1 == 0:
-                print("iter {:4d}    cost  {:.5f}".format(i, loss))
-
-            if loss.item() < tol:  # breaking condition
-                print("\nOptimum found after {:3d} Steps!".format(i))
-                _, opti_mopti = model(x)
-                return cost_hist, opti_mopti, 0
-        _, opti_mopti = model(x)
-        return cost_hist, opti_mopti, -1
-
         # initial weights
         w = self.ansatz.init_weights()
 
         # local optimization
-        w, cost_vals, iters = self.optimizer.optimize(func=self.cost, w=w, epochs=self.epochs, tol=self.tol)
+        w, cost_vals, iters = self.optimizer.optimize(model=model, w=w, epochs=self.epochs, tol=self.tol)
 
         return w, cost_vals
 

@@ -7,6 +7,7 @@ from src.solver.quantum.vqls.vqls import VQLS
 from src.solver.quantum.vqls.vqls_fast_and_slow import FastSlowVQLS
 from src.utils.plotting import plot_costs
 from src.solver.quantum.vqls.vqls_dnn import DeepVQLS
+from src.optimizers.optim_torch import SGDTorch
 
 # reproducibility
 np.random.seed(42)
@@ -33,13 +34,14 @@ solver3.set_lse(A=A0, b=b0)
 
 # choose optimizer, ansatz, state preparation, backend
 optim_ = AdamQML()
+optim__ = SGDTorch()
 ansatz_ = HardwareEfficient(nqubits=nqubits, nlayers=nlayers)
 prep_ = MottonenStatePrep(wires=range(nqubits))
 backend_ = DefaultQubit(wires=nqubits + 1)
 
 solver1.setup(optimizer=optim_, ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, tol=1e-5)
 solver2.setup(optimizer=optim_, ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, epochs_bo=10, tol=1e-5)
-solver3.setup(optimizer=optim_, ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, tol=1e-5)
+solver3.setup(optimizer=optim__, ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, tol=1e-5)
 
 xopt1 = solver1.solve()
 xopt2 = solver2.solve()

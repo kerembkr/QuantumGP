@@ -1,98 +1,53 @@
-from time import time
-import pennylane as qml
 import pennylane.numpy as np
 from abc import ABC, abstractmethod
+import torch
+from time import time
 
 
 class OptimizerTorch(ABC):
     def __init__(self):
         self.name = None
 
-    def optimize(self, func, w, epochs, tol):
+    def optimize(self, model, w, epochs, tol):
 
-        # Get the optimizer from the child class
-        opt = self.get_optimizer()
+        # features
+        x = torch.ones(model.ninputs) * (np.pi / 4)
+
+        # Optimizer
+        opt = self.get_optimizer(model)
 
         # Optimization loop
         cost_vals = []
         for it in range(epochs):
             ta = time()
-            w, cost_val = opt.step_and_cost(func, w)
-            print("{:20s}     Step {:3d}    obj = {:9.7f}    time = {:9.7f} sec".format(self.name, it, cost_val, time() - ta))
-            cost_vals.append(cost_val)
-            if np.abs(cost_val) < tol:
+
+            # neural network maths
+            opt.zero_grad()  # init gradient
+            out, _ = model(x)  # forward pass
+            loss = self.cost(out)  # compute loss
+            loss.backward()  # backpropagation
+            opt.step()  # update weights
+
+            print("{:20s}     Step {:3d}    obj = {:9.7f}    time = {:9.7f} sec".format(self.name, it, loss.item(), time() - ta))
+            cost_vals.append(loss.item())  # save cost function value
+            if np.abs(loss.item()) < tol:  # breaking condition
+                _, w = model(x)
                 return w, cost_vals, it+1
+
+        _, w = model(x)
 
         return w, cost_vals, epochs
 
     @abstractmethod
-    def get_optimizer(self):
+    def get_optimizer(self, model):
         pass
 
 
-class GradientDescentQML(OptimizerTorch):
+class SGDTorch(OptimizerTorch):
     def __init__(self, eta=0.1):
         super().__init__()
         self.eta = eta
-        self.name = "GD"
+        self.name = "SGD"
 
-    def get_optimizer(self):
-        return qml.GradientDescentOptimizer(self.eta)
-
-
-class AdamQML(OptimizerTorch):
-    def __init__(self, eta=0.1, beta1=0.9, beta2=0.99, eps=1e-8):
-        super().__init__()
-        self.eta = eta
-        self.name = "Adam"
-        self.beta1 = beta1
-        self.beta2 = beta2
-        self.eps = eps
-
-    def get_optimizer(self):
-        return qml.AdamOptimizer(stepsize=self.eta, beta1=self.beta1, beta2=self.beta2, eps=self.eps)
-
-
-class AdagradQML(OptimizerTorch):
-    def __init__(self, eta=0.1, eps=1e-8):
-        super().__init__()
-        self.eta = eta
-        self.name = "Adagrad"
-        self.eps = eps
-
-    def get_optimizer(self):
-        return qml.AdagradOptimizer(stepsize=self.eta, eps=self.eps)
-
-
-class MomentumQML(OptimizerTorch):
-    def __init__(self, eta=0.1, beta=0.9):
-        super().__init__()
-        self.eta = eta
-        self.name = "Momentum"
-        self.beta = beta
-
-    def get_optimizer(self):
-        return qml.MomentumOptimizer(stepsize=self.eta, momentum=self.beta)
-
-
-class NesterovMomentumQML(OptimizerTorch):
-    def __init__(self, eta=0.1, beta=0.9):
-        super().__init__()
-        self.eta = eta
-        self.name = "Nesterov"
-        self.beta = beta
-
-    def get_optimizer(self):
-        return qml.NesterovMomentumOptimizer(stepsize=self.eta, momentum=self.beta)
-
-
-class RMSPropQML(OptimizerTorch):
-    def __init__(self, eta=0.1, decay=0.9, eps=1e-8):
-        super().__init__()
-        self.eta = eta
-        self.name = "RMSProp"
-        self.decay = decay
-        self.eps = eps
-
-    def get_optimizer(self):
-        return qml.RMSPropOptimizer(stepsize=self.eta, decay=self.decay, eps=self.eps)
+    def get_optimizer(self, model):
+        return torch.optim.SGD(params=model.parameters, lr=self.eta)
