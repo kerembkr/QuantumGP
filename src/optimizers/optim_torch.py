@@ -30,7 +30,7 @@ class OptimizerTorch(ABC):
             loss.backward()  # backpropagation
             opt.step()  # update weights
 
-            print("{:20s}     Step {:3d}    obj = {:9.7f}    time = {:9.7f} sec".format(self.name, it, loss.item(), time() - ta))
+            print("{:s}     Step {:3d}    obj = {:9.7f}    time = {:9.7f} sec".format(self.name, it, loss.item(), time() - ta))
             cost_vals.append(loss.item())  # save cost function value
             if np.abs(loss.item()) < tol:  # breaking condition
                 _, w = model(x)

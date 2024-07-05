@@ -3,6 +3,7 @@ import pennylane.numpy as np
 from abc import ABC, abstractmethod
 import torch
 
+
 class Ansatz(ABC):
     def __init__(self, nqubits, nlayers):
         self.nqubits = nqubits
@@ -43,6 +44,7 @@ class HardwareEfficient(Ansatz):
         return np.reshape(w, (self.nqubits, 1 + self.nlayers))
 
     def prep_weights(self, w):
+        # print("w", w)
         try:
             return np.reshape(w, (self.nqubits, 1 + self.nlayers))
         except:
