@@ -50,4 +50,4 @@ class SGDTorch(OptimizerTorch):
         self.name = "SGD"
 
     def get_optimizer(self, model):
-        return torch.optim.SGD(params=model.parameters, lr=self.eta)
+        return torch.optim.SGD(params=model.parameters(), lr=self.eta)
