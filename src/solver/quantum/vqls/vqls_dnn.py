@@ -94,7 +94,6 @@ class HybridNeuralNetwork(nn.Module):
         y = self.lin2(y)
         y = self.tanh(y)
         y = self.lin3(y)
-        # y = torch.reshape(y, (1, self.nqubits))
         y = torch.reshape(y, (1, self.nqubits + self.nqubits * self.nlayers))  # number of ansatz weights
 
         # use output of the DNN for every VQC

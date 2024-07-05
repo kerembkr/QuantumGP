@@ -1,7 +1,7 @@
 import pennylane as qml
 import pennylane.numpy as np
 from abc import ABC, abstractmethod
-
+import torch
 
 class Ansatz(ABC):
     def __init__(self, nqubits, nlayers):
@@ -43,7 +43,10 @@ class HardwareEfficient(Ansatz):
         return np.reshape(w, (self.nqubits, 1 + self.nlayers))
 
     def prep_weights(self, w):
-        return np.reshape(w, (self.nqubits, 1 + self.nlayers))
+        try:
+            return np.reshape(w, (self.nqubits, 1 + self.nlayers))
+        except:
+            return torch.reshape(w, (self.nqubits, 1 + self.nlayers))
 
 
 class StrongEntangling(Ansatz):
