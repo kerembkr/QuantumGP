@@ -1,7 +1,7 @@
 from src.utils.ansatz import HardwareEfficient
 from src.utils.embedding import *
 from src.optimizers.optim_qml import *
-from src.utils.backend import DefaultQubit
+from src.utils.backend import DefaultQubit, DefaultQubitTorch
 from src.utils.utils import get_random_ls
 from src.solver.quantum.vqls.vqls import VQLS
 from src.solver.quantum.vqls.vqls_fast_and_slow import FastSlowVQLS
@@ -17,7 +17,7 @@ nqubits = 1
 nlayers = 1
 
 # maximum number of iterations
-maxiter = 20
+maxiter = 10
 
 # random symmetric positive definite matrix
 A0, b0 = get_random_ls(nqubits, easy_example=False)
@@ -33,15 +33,12 @@ solver2.set_lse(A=A0, b=b0)
 solver3.set_lse(A=A0, b=b0)
 
 # choose optimizer, ansatz, state preparation, backend
-optim_ = AdamQML()
-optim__ = SGDTorch()
 ansatz_ = HardwareEfficient(nqubits=nqubits, nlayers=nlayers)
 prep_ = MottonenStatePrep(wires=range(nqubits))
-backend_ = DefaultQubit(wires=nqubits + 1)
 
-solver1.setup(optimizer=optim_, ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, tol=1e-5)
-solver2.setup(optimizer=optim_, ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, epochs_bo=10, tol=1e-5)
-solver3.setup(optimizer=optim__, ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, tol=1e-5)
+solver1.setup(optimizer=AdamQML(), ansatz=ansatz_, stateprep=prep_, backend=DefaultQubit(wires=nqubits + 1), epochs=maxiter, tol=1e-5)
+solver2.setup(optimizer=AdamQML(), ansatz=ansatz_, stateprep=prep_, backend=DefaultQubit(wires=nqubits + 1), epochs=maxiter, epochs_bo=None, tol=1e-5)
+solver3.setup(optimizer=SGDTorch(), ansatz=ansatz_, stateprep=prep_, backend=DefaultQubitTorch(wires=nqubits + 1), epochs=maxiter, tol=1e-5)
 
 xopt1 = solver1.solve()
 xopt2 = solver2.solve()

@@ -83,6 +83,29 @@ class DefaultQubit(QDeviceBase):
                         max_workers=self.max_workers)
 
 
+class DefaultQubitTorch(QDeviceBase):
+    """
+    Backend for the default.qubit.torch simulator.
+    """
+
+    def __init__(self, wires, shots=None, seed=None, max_workers=None, observable="sigz", returntype="expval"):
+        super().__init__()
+        self.name = "default.qubit.torch"
+        self.wires = wires
+        self.shots = shots
+        self.seed = seed
+        self.max_workers = max_workers
+        self.observable = self.observable_list[observable]
+        self.returntype = self.returntype_list[returntype]
+
+        # set the backend device
+        self.set_device(device_name=self.name,
+                        wires=self.wires,
+                        shots=self.shots,
+                        seed=self.seed,
+                        max_workers=self.max_workers)
+
+
 class LightningQubit(QDeviceBase):
     """
     Backend for the lightning.qubit simulator.

@@ -131,6 +131,8 @@ class VQLS(Solver):
 
         """
 
+        print("=======", self.backend.device)
+
         @qml.qnode(self.backend.qdevice)
         def qcircuit(weights):
 
