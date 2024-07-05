@@ -17,10 +17,10 @@ nqubits = 1
 nlayers = 1
 
 # maximum number of iterations
-maxiter = 10
+maxiter = 200
 
 # random symmetric positive definite matrix
-A0, b0 = get_random_ls(nqubits, easy_example=False)
+A0, b0 = get_random_ls(nqubits, easy_example=True)
 
 # init solvers
 solver1 = VQLS()
