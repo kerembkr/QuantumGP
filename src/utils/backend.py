@@ -88,13 +88,13 @@ class DefaultQubitTorch(QDeviceBase):
     Backend for the default.qubit.torch simulator.
     """
 
-    def __init__(self, wires, shots=None, seed=None, max_workers=None, observable="sigz", returntype="expval"):
+    def __init__(self, wires, shots=None, analytic=None, torch_device=None, observable="sigz", returntype="expval"):
         super().__init__()
         self.name = "default.qubit.torch"
         self.wires = wires
         self.shots = shots
-        self.seed = seed
-        self.max_workers = max_workers
+        self.analytic = analytic
+        self.torch_device = torch_device
         self.observable = self.observable_list[observable]
         self.returntype = self.returntype_list[returntype]
 
@@ -102,8 +102,8 @@ class DefaultQubitTorch(QDeviceBase):
         self.set_device(device_name=self.name,
                         wires=self.wires,
                         shots=self.shots,
-                        seed=self.seed,
-                        max_workers=self.max_workers)
+                        analytic=self.analytic,
+                        torch_device=self.torch_device)
 
 
 class LightningQubit(QDeviceBase):
