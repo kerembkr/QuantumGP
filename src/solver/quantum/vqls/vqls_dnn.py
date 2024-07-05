@@ -44,7 +44,7 @@ class DeepVQLS(VQLS):
         w = self.ansatz.init_weights()
 
         # local optimization
-        w, cost_vals, iters = self.optimizer.optimize(model=model, w=w, epochs=self.epochs, tol=self.tol)
+        w, cost_vals, iters = self.optimizer.optimize(func=self.cost, model=model, w=w, epochs=self.epochs, tol=self.tol)
 
         return w, cost_vals
 

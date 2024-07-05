@@ -8,7 +8,7 @@ class OptimizerTorch(ABC):
     def __init__(self):
         self.name = None
 
-    def optimize(self, model, w, epochs, tol):
+    def optimize(self, func, model, w, epochs, tol):
 
         # features
         x = torch.ones(model.ninputs) * (np.pi / 4)
@@ -24,7 +24,9 @@ class OptimizerTorch(ABC):
             # neural network maths
             opt.zero_grad()  # init gradient
             out, _ = model(x)  # forward pass
-            loss = self.cost(out)  # compute loss
+            # loss = self.cost(out)  # compute loss
+            loss = func(out)  # compute loss
+
             loss.backward()  # backpropagation
             opt.step()  # update weights
 
