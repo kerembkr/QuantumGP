@@ -34,6 +34,9 @@ class DeepVQLS(VQLS):
 
         ni = 4
 
+        # numpy to torch
+        self.c = torch.from_numpy(self.c)
+
         model = HybridNeuralNetwork(qnode=qlayers, nqubits=self.nqubits, nlayers=self.ansatz.nlayers, ninputs=ni,
                                     npaulis=len(self.c))
 
@@ -60,7 +63,7 @@ class HybridNeuralNetwork(nn.Module):
         # classical layers
         self.lin1 = nn.Linear(self.ninputs, 8)
         self.lin2 = nn.Linear(8, 8)
-        self.lin3 = nn.Linear(8, self.nqubits)
+        self.lin3 = nn.Linear(8, self.nqubits + self.nqubits * self.nlayers)  # number of ansatz weights
         self.relu = nn.ReLU()
         self.tanh = nn.Tanh()
 
@@ -71,12 +74,10 @@ class HybridNeuralNetwork(nn.Module):
         for l in range(self.npaulis):
             for lp in range(self.npaulis):
                 for part in ["Re", "Im"]:
-                    # setattr(self, f"xx_{it}", qml.qnn.TorchLayer(self.qnode[(l, lp, -1, part)], {"weights": (self.nqubits)}))
                     setattr(self, f"xx_{it}", self.qnode[(l, lp, -1, part)])
                     self.qlayers[(l, lp, -1, part)] = getattr(self, f"xx_{it}")
                     it += 1
                     for j in range(self.nqubits):
-                        # setattr(self, f"xx_{it}", qml.qnn.TorchLayer(self.qnode[(l, lp, j, part)], {"weights": (self.nqubits)}))
                         setattr(self, f"xx_{it}", self.qnode[(l, lp, j, part)])
                         self.qlayers[(l, lp, j, part)] = getattr(self, f"xx_{it}")
                         it += 1
