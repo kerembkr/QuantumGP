@@ -43,10 +43,13 @@ solver3.setup(optimizer=SGDTorch(), ansatz=ansatz_, stateprep=prep_, backend=Def
 
 # solve linear systems
 xopt1 = solver1.solve()
+print("")
 xopt2 = solver2.solve()
+print("")
 xopt3 = solver3.solve()
 
 # solution of linear system
+print("")
 print("xopt1", xopt1)
 print("xopt2", xopt2)
 print("xopt3", xopt3)
