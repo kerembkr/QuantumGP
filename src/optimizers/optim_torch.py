@@ -24,9 +24,7 @@ class OptimizerTorch(ABC):
             # neural network maths
             opt.zero_grad()  # init gradient
             out, _ = model(x)  # forward pass
-            # loss = self.cost(out)  # compute loss
             loss = func(out)  # compute loss
-
             loss.backward()  # backpropagation
             opt.step()  # update weights
 

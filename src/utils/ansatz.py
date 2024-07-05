@@ -44,7 +44,6 @@ class HardwareEfficient(Ansatz):
         return np.reshape(w, (self.nqubits, 1 + self.nlayers))
 
     def prep_weights(self, w):
-        # print("w", w)
         try:
             return np.reshape(w, (self.nqubits, 1 + self.nlayers))
         except:

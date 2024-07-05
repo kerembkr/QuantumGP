@@ -48,6 +48,37 @@ class DeepVQLS(VQLS):
 
         return w, cost_vals
 
+    def cost(self, out):
+        """
+        Local version of the cost function. Tends to zero when A|x> is proportional
+        to |b>.
+
+        Args:
+            out (np.array): outputs of all quantum circuit evaluations
+
+        Returns:
+            C_L (float): Cost function value
+
+        """
+
+        # compute sums
+        psi_norm = 0.0
+        for l in range(0, len(self.c)):
+            for lp in range(0, len(self.c)):
+                psi_norm += self.c[l] * np.conj(self.c[lp]) * (out[(l, lp, -1, "Re")] + 1.0j * out[(l, lp, -1, "Im")])
+
+        # compute sums
+        mu_sum = 0.0
+        for l in range(0, len(self.c)):
+            for lp in range(0, len(self.c)):
+                for j in range(0, self.nqubits):
+                    mu_sum += self.c[l] * np.conj(self.c[lp]) * (out[(l, lp, j, "Re")] + 1.0j * out[(l, lp, j, "Im")])
+
+        # Cost function
+        C_L = 0.5 - 0.5 * abs(mu_sum) / (self.nqubits * abs(psi_norm))
+
+        return C_L
+
 
 class HybridNeuralNetwork(nn.Module):
 
