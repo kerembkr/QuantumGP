@@ -13,8 +13,8 @@ from src.optimizers.optim_torch import SGDTorch
 np.random.seed(42)
 
 # number of qubits & layers
-nqubits = 1
-nlayers = 1
+nqubits = 3
+nlayers = 3
 
 # maximum number of iterations
 maxiter = 200
