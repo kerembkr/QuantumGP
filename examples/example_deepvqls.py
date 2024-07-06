@@ -14,7 +14,7 @@ np.random.seed(42)
 nqubits = 1
 nlayers = 1
 
-maxiter = 50
+maxiter = 10
 
 # init
 solver1 = DeepVQLS()

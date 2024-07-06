@@ -55,4 +55,4 @@ for optim in optims:
     print("xopt :", xopt)
 
 title = "VQLS   {:s}    qubits = {:d}    layers = {:d}".format(ansatz_.__class__.__name__, nqubits, nlayers)
-plot_costs(data=cost_hists, save_png=True, title=title, fname="vqls_optimizer_comparison")
+plot_costs(data=cost_hists, save_png=True, title=None, fname="vqls_optimizer_comparison_hea_nq1_nl1")

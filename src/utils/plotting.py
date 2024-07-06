@@ -3,8 +3,11 @@ from src.utils.utils import save_fig
 from matplotlib.ticker import MaxNLocator
 
 
+plt.rcParams['text.usetex'] = True
+
+
 def plot_fast_slow(cost_history, epochs, epochs_bo, opt_name, iters):
-    fig, ax = plt.subplots(1, 1, figsize=(8, 5))
+    fig, ax = plt.subplots(1, 1, figsize=(10, 5))
     plt.plot(cost_history, "grey", linewidth=1.5)
     plt.scatter(range(epochs_bo, epochs_bo + iters), cost_history[epochs_bo:], c="r", linewidth=1,
                 label=opt_name)
@@ -15,11 +18,11 @@ def plot_fast_slow(cost_history, epochs, epochs_bo, opt_name, iters):
     min_index = cost_history[0:epochs_bo].index(min_value)
     plt.scatter(min_index, min_value, c="y", linewidth=1, label="Best Guess")
 
-    ax.set_xlabel("Iteration", fontsize=15)
-    ax.set_ylabel("Cost Function", fontsize=15)
+    ax.set_xlabel("epoch", fontsize=15)
+    ax.set_ylabel("loss", fontsize=15)
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-    ax.tick_params(direction="in", labelsize=12, length=10, width=0.8, colors='k')
+    ax.tick_params(direction="in", labelsize=20, length=10, width=0.8, colors='k')
     ax.spines['top'].set_linewidth(2.0)
     ax.spines['bottom'].set_linewidth(2.0)
     ax.spines['left'].set_linewidth(2.0)
@@ -32,15 +35,15 @@ def plot_fast_slow(cost_history, epochs, epochs_bo, opt_name, iters):
 
 def plot_costs(data, save_png=False, title=None, log=False, fname=None):
     # plot curves
-    fig, ax = plt.subplots(1, 1, figsize=(10, 6))
+    fig, ax = plt.subplots(1, 1, figsize=(10, 5))
     for label, cost in data.items():
         ax.plot(cost, linewidth=2.0, label=label)
     if log:  # logarithmic
         ax.set_yscale('log', base=10)
-    ax.set_xlabel("Iteration", fontsize=18, labelpad=15, fontname='serif')
-    ax.set_ylabel("Cost Function", fontsize=18, labelpad=15, fontname='serif')
+    ax.set_xlabel("epoch", fontsize=18, labelpad=15, fontname='serif')
+    ax.set_ylabel("loss", fontsize=18, labelpad=15, fontname='serif')
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-    ax.tick_params(direction="in", labelsize=12, length=10, width=0.8, colors='k')
+    ax.tick_params(direction="in", labelsize=20, length=10, width=0.8, colors='k')
     ax.spines['top'].set_linewidth(2.0)
     ax.spines['bottom'].set_linewidth(2.0)
     ax.spines['left'].set_linewidth(2.0)
