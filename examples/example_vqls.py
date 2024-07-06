@@ -12,10 +12,10 @@ import numpy as np
 np.random.seed(42)
 
 # number of qubits & layers
-nqubits = 1
-nlayers = 1
+nqubits = 2
+nlayers = 2
 
-maxiter = 50
+maxiter = 100
 
 # init
 solver = VQLS()
@@ -54,5 +54,5 @@ for optim in optims:
     # print solution
     print("xopt :", xopt)
 
-title = "VQLS   {:s}    qubits = {:d}    layers = {:d}".format(ansatz_.__class__.__name__, nqubits, nlayers)
-plot_costs(data=cost_hists, save_png=True, title=None, fname="vqls_optimizer_comparison_hea_nq1_nl1")
+plot_costs(data=cost_hists, save_png=True, title=None, fname="vqls_optimizer_comparison_hea_nq{:d}_nl{:d}".format(
+    nqubits, nlayers))

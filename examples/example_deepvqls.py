@@ -11,10 +11,10 @@ import numpy as np
 np.random.seed(42)
 
 # number of qubits & layers
-nqubits = 1
-nlayers = 1
+nqubits = 2
+nlayers = 2
 
-maxiter = 10
+maxiter = 100
 
 # init
 solver1 = DeepVQLS()
@@ -52,4 +52,5 @@ cost_hists = {"Adam": solver1.loss,
               "RMSProp": solver3.loss,
               "SGD": solver4.loss}
 
-plot_costs(data=cost_hists, save_png=True, title=None, fname="deep_vqls_optimizer_comparison_hea_nq1_nl1")
+plot_costs(data=cost_hists, save_png=True, title=None, fname="deep_vqls_optimizer_comparison_hea_nq{:d}_nl{:d}".format(
+    nqubits, nlayers))

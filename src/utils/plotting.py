@@ -52,6 +52,7 @@ def plot_costs(data, save_png=False, title=None, log=False, fname=None):
     legend = ax.legend(frameon=True, fontsize=12)
     legend.get_frame().set_edgecolor('black')
     legend.get_frame().set_linewidth(1.2)
+    plt.tight_layout()  # Adjust the layout
     if title is not None:
         ax.set_title(title, fontsize=18, fontname='serif')
 
