@@ -29,36 +29,27 @@ solver2.set_lse(A=A0, b=b0)
 solver3.set_lse(A=A0, b=b0)
 solver4.set_lse(A=A0, b=b0)
 
-
-# choose optimizer
-optims = [AdamTorch(),
-          AdagradTorch(),
-          RMSPropTorch(),
-          SGDTorch()]
-
 # choose ansatz, state preparation, backend
 ansatz_ = HardwareEfficient(nqubits=nqubits, nlayers=nlayers)
 prep_ = MottonenStatePrep(wires=range(nqubits))
 backend_ = DefaultQubitTorch(wires=nqubits + 1)
 
-cost_hists = {}
-wopts = {}
-
+# setup
 solver1.setup(optimizer=AdamTorch(), ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, tol=1e-5)
 solver2.setup(optimizer=AdagradTorch(), ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, tol=1e-5)
 solver3.setup(optimizer=RMSPropTorch(), ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, tol=1e-5)
 solver4.setup(optimizer=SGDTorch(), ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, tol=1e-5)
 
-
+# solve linear system
 xopt1 = solver1.solve()
 xopt2 = solver2.solve()
 xopt3 = solver3.solve()
 xopt4 = solver4.solve()
 
-cost_hists["Adam"] = solver1.loss
-cost_hists["Adagrad"] = solver2.loss
-cost_hists["RMSProp"] = solver3.loss
-cost_hists["SGD"] = solver4.loss
+# loss curves
+cost_hists = {"Adam": solver1.loss,
+              "Adagrad": solver2.loss,
+              "RMSProp": solver3.loss,
+              "SGD": solver4.loss}
 
-title = "DeepVQLS   {:s}    qubits = {:d}    layers = {:d}".format(ansatz_.__class__.__name__, nqubits, nlayers)
-plot_costs(data=cost_hists, save_png=True, title=title, fname="deep_vqls_optimizer_comparison")
+plot_costs(data=cost_hists, save_png=True, title=None, fname="deep_vqls_optimizer_comparison_hea_nq1_nl1")
