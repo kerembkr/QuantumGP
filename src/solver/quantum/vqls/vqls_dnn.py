@@ -3,11 +3,45 @@ import torch.nn as nn
 import functools
 import torch
 import pennylane.numpy as np
+from src.utils.ansatz import HardwareEfficient
+from src.utils.embedding import MottonenStatePrep
+from src.utils.backend import DefaultQubitTorch
+from src.optimizers.optim_torch import SGDTorch
 
 
 class DeepVQLS(VQLS):
     def __init__(self):
         super().__init__()
+        self.nhidden = None
+        self.ninputs = None
+
+    def setup(self, optimizer=None, ansatz=None, stateprep=None, backend=None, epochs=100, tol=1e-4, ninputs=4,
+              nhidden=8):
+
+        self.epochs = epochs
+        self.tol = tol
+        self.ninputs = ninputs
+        self.nhidden = nhidden
+
+        if optimizer is None:
+            self.optimizer = SGDTorch()
+        else:
+            self.optimizer = optimizer
+
+        if ansatz is None:
+            self.ansatz = HardwareEfficient(nqubits=self.nqubits, nlayers=1)
+        else:
+            self.ansatz = ansatz
+
+        if stateprep is None:
+            self.stateprep = MottonenStatePrep(wires=range(self.nqubits))
+        else:
+            self.stateprep = stateprep
+
+        if backend is None:
+            self.backend = DefaultQubitTorch(wires=self.nqubits + 1)
+        else:
+            self.backend = backend
 
     def create_qnodes(self):
         qnode_dict = {}
@@ -32,13 +66,11 @@ class DeepVQLS(VQLS):
         # init hybrid model
         qlayers = self.create_qnodes()
 
-        ni = 8
-
         # numpy to torch
         self.c = torch.from_numpy(self.c)
 
-        model = HybridNeuralNetwork(qnode=qlayers, nqubits=self.nqubits, nlayers=self.ansatz.nlayers, ninputs=ni,
-                                    npaulis=len(self.c))
+        model = HybridNeuralNetwork(qnode=qlayers, nqubits=self.nqubits, nlayers=self.ansatz.nlayers, ninputs=self.ninputs,
+                                    npaulis=len(self.c), nhidden=self.nhidden)
 
         # initial weights
         w = self.ansatz.init_weights()
@@ -82,7 +114,7 @@ class DeepVQLS(VQLS):
 
 class HybridNeuralNetwork(nn.Module):
 
-    def __init__(self, qnode, nqubits, nlayers, ninputs, npaulis):
+    def __init__(self, qnode, nqubits, nlayers, ninputs, npaulis, nhidden):
         super().__init__()
 
         # number of qubits & layers & inputs & paulis
@@ -90,13 +122,12 @@ class HybridNeuralNetwork(nn.Module):
         self.nlayers = nlayers
         self.ninputs = ninputs
         self.npaulis = npaulis
-
-        nhidden = 16
+        self.nhidden = nhidden
 
         # classical layers
-        self.lin1 = nn.Linear(self.ninputs, nhidden)
-        self.lin2 = nn.Linear(nhidden, nhidden)
-        self.lin3 = nn.Linear(nhidden, self.nqubits + self.nqubits * self.nlayers)  # number of ansatz weights
+        self.lin1 = nn.Linear(self.ninputs, self.nhidden)
+        self.lin2 = nn.Linear(self.nhidden, self.nhidden)
+        self.lin3 = nn.Linear(self.nhidden, self.nqubits + self.nqubits * self.nlayers)  # number of ansatz weights
         self.relu = nn.ReLU()
         self.tanh = nn.Tanh()
 
