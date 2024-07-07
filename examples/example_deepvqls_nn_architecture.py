@@ -16,41 +16,36 @@ nlayers = 1
 
 maxiter = 100
 
-# init
-solver1 = DeepVQLS()
-solver2 = DeepVQLS()
-solver3 = DeepVQLS()
-solver4 = DeepVQLS()
-
-# set linear system
-A0, b0 = get_random_ls(nqubits, easy_example=True)  # random spd
-solver1.set_lse(A=A0, b=b0)
-solver2.set_lse(A=A0, b=b0)
-solver3.set_lse(A=A0, b=b0)
-solver4.set_lse(A=A0, b=b0)
+nsolvers = 10
 
 # choose ansatz, state preparation, backend
 ansatz_ = HardwareEfficient(nqubits=nqubits, nlayers=nlayers)
 prep_ = MottonenStatePrep(wires=range(nqubits))
 backend_ = DefaultQubitTorch(wires=nqubits + 1)
 
-# setup
-solver1.setup(optimizer=AdamTorch(), ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, tol=1e-5)
-solver2.setup(optimizer=AdagradTorch(), ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, tol=1e-5)
-solver3.setup(optimizer=RMSPropTorch(), ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, tol=1e-5)
-solver4.setup(optimizer=SGDTorch(), ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, tol=1e-5)
+cost_hists = {}
 
-# solve linear system
-xopt1 = solver1.solve()
-xopt2 = solver2.solve()
-xopt3 = solver3.solve()
-xopt4 = solver4.solve()
+for i in range(nsolvers):
 
-# loss curves
-cost_hists = {"Adam": solver1.loss,
-              "Adagrad": solver2.loss,
-              "RMSProp": solver3.loss,
-              "SGD": solver4.loss}
+    ninputs = 4*(i+1)
+    nhidden = 8
 
-plot_costs(data=cost_hists, save_png=True, title=None, fname="deep_vqls_optimizer_comparison_hea_nq{:d}_nl{:d}".format(
+    # init
+    solver = DeepVQLS()
+
+    # set linear system
+    A0, b0 = get_random_ls(nqubits, easy_example=True)  # random spd
+    solver.set_lse(A=A0, b=b0)
+
+    # setup
+    solver.setup(optimizer=SGDTorch(), ansatz=ansatz_, stateprep=prep_, backend=backend_, epochs=maxiter, tol=1e-5,
+                 ninputs=ninputs, nhidden=nhidden)
+
+    # solve linear system
+    solver.solve()
+
+    # loss curves
+    cost_hists["ninputs_{:d}".format(ninputs)] = solver.loss
+
+plot_costs(data=cost_hists, save_png=True, title=None, fname="deep_vqls_nn_architecture_hea_nq{:d}_nl{:d}".format(
     nqubits, nlayers))
