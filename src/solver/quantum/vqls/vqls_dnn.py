@@ -32,7 +32,7 @@ class DeepVQLS(VQLS):
         # init hybrid model
         qlayers = self.create_qnodes()
 
-        ni = 4
+        ni = 8
 
         # numpy to torch
         self.c = torch.from_numpy(self.c)
@@ -91,10 +91,12 @@ class HybridNeuralNetwork(nn.Module):
         self.ninputs = ninputs
         self.npaulis = npaulis
 
+        nhidden = 16
+
         # classical layers
-        self.lin1 = nn.Linear(self.ninputs, 8)
-        self.lin2 = nn.Linear(8, 8)
-        self.lin3 = nn.Linear(8, self.nqubits + self.nqubits * self.nlayers)  # number of ansatz weights
+        self.lin1 = nn.Linear(self.ninputs, nhidden)
+        self.lin2 = nn.Linear(nhidden, nhidden)
+        self.lin3 = nn.Linear(nhidden, self.nqubits + self.nqubits * self.nlayers)  # number of ansatz weights
         self.relu = nn.ReLU()
         self.tanh = nn.Tanh()
 

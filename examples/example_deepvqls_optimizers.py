@@ -11,8 +11,8 @@ import numpy as np
 np.random.seed(42)
 
 # number of qubits & layers
-nqubits = 2
-nlayers = 2
+nqubits = 1
+nlayers = 1
 
 maxiter = 100
 
@@ -49,7 +49,7 @@ xopt4 = solver4.solve()
 # loss curves
 cost_hists = {"Adam": solver1.loss,
               "Adagrad": solver2.loss,
-              "RMSProp": solver3.loss,
+              # "RMSProp": solver3.loss,
               "SGD": solver4.loss}
 
 plot_costs(data=cost_hists, save_png=True, title=None, fname="deep_vqls_optimizer_comparison_hea_nq{:d}_nl{:d}".format(
