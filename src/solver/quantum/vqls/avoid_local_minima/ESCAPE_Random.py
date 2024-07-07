@@ -1,14 +1,17 @@
 from helper import *
 from Q_circuits import *
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 p = 1  # Number of circuit repetitions (not applicable here)
 path = "Graphs/"
-graphs = graph_loader(path, 4)
+graphs = graph_loader(path, 3)
 G = new_G(graphs[-1])
 
 
-n_random = 200  # number of random seeds
+# n_random = 200  # number of random seeds
+n_random = 10  # number of random seeds
+
 
 dev1 = qml.device('default.qubit.tf', wires=len(G.nodes), shots=500)
 dev2 = qml.device('default.qubit', wires=len(G.nodes), shots=500)
@@ -106,3 +109,7 @@ for i in tqdm(range(n_random)):
     for k in range(QAOA4_steps):
         params, cost = QAOA_opt(params, opt, Energies, qcircuit, Net=None, G=G, p=p, sequence=sequence)
     E_final[i] = cost
+
+plt.figure()
+plt.plot(E_final)
+plt.show()
