@@ -38,11 +38,11 @@ prep_ = MottonenStatePrep(wires=range(nqubits))
 
 # setup VQLS solvers
 solver1.setup(optimizer=AdamQML(), ansatz=ansatz_, stateprep=prep_, backend=DefaultQubit(wires=nqubits + 1),
-              epochs=maxiter, tol=1e-5)
+              epochs=maxiter, tol=1e-7)
 solver2.setup(optimizer=AdamQML(), ansatz=ansatz_, stateprep=prep_, backend=DefaultQubit(wires=nqubits + 1),
-              epochs=maxiter, epochs_bo=None, tol=1e-5)
+              epochs=maxiter, epochs_bo=None, tol=1e-7)
 solver3.setup(optimizer=SGDTorch(), ansatz=ansatz_, stateprep=prep_, backend=DefaultQubitTorch(wires=nqubits + 1),
-              epochs=maxiter, tol=1e-5)
+              epochs=maxiter, tol=1e-7, nhidden=16, ninputs=8)
 
 # solve linear systems
 xopt1 = solver1.solve()

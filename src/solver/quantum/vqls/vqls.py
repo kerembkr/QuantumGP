@@ -357,10 +357,10 @@ class VQLS(Solver):
             pass
 
         # Step 4: Calculate the optimal scaling factor mu
-        Ax_normed = self.A @ x
+        Ax_normed = self.A @ x  # O(n^2)
         mu = self.bnorm / np.linalg.norm(Ax_normed)
 
         # Step 5: Scale x_normed to get the original solution x
-        x = mu * x
+        x = mu * x  # O(n)
 
         return x
