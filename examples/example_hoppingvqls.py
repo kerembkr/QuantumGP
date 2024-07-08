@@ -13,8 +13,8 @@ np.random.seed(42)
 
 
 # number of qubits & layers
-nqubits = 3
-nlayers = 3
+nqubits = 2
+nlayers = 2
 maxiter = 100
 
 # choose ansatz, state preparation, backend
