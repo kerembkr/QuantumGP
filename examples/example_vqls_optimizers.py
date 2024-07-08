@@ -51,8 +51,5 @@ for optim in optims:
     # save loss data
     cost_hists[optim.name] = solver.loss
 
-    # print solution
-    # print("xopt :", xopt)
-
 plot_costs(data=cost_hists, save_png=True, title=None, fname="vqls_optimizer_comparison_hea_nq{:d}_nl{:d}".format(
     nqubits, nlayers))
