@@ -12,8 +12,8 @@ import numpy as np
 np.random.seed(42)
 
 # number of qubits & layers
-nqubits = 2
-nlayers = 2
+nqubits = 1
+nlayers = 1
 
 maxiter = 100
 
@@ -52,7 +52,7 @@ for optim in optims:
     cost_hists[optim.name] = solver.loss
 
     # print solution
-    print("xopt :", xopt)
+    # print("xopt :", xopt)
 
 plot_costs(data=cost_hists, save_png=True, title=None, fname="vqls_optimizer_comparison_hea_nq{:d}_nl{:d}".format(
     nqubits, nlayers))

@@ -3,7 +3,6 @@ from src.utils.embedding import *
 from src.optimizers.optim_qml import *
 from src.utils.backend import DefaultQubit
 from src.solver.quantum.vqls.vqls import VQLS
-from scipy.optimize import basinhopping
 
 
 class HoppingVQLS(VQLS):
@@ -35,31 +34,6 @@ class HoppingVQLS(VQLS):
         else:
             self.backend = backend
 
-    # def opt(self, optimizer=None, ansatz=None, stateprep=None, backend=None, epochs=100, tol=1e-4):
-    #     """
-    #
-    #     Parameters
-    #     ----------
-    #     optimizer
-    #     ansatz
-    #     stateprep
-    #     backend
-    #     epochs
-    #     tol
-    #
-    #     Returns
-    #     -------
-    #
-    #     """
-    #
-    #     # initial weights
-    #     w = self.ansatz.init_weights()
-    #
-    #     # local optimization
-    #     w, cost_vals, iters = self.optimizer.optimize(func=self.cost, w=w, epochs=self.epochs, tol=self.tol)
-    #
-    #     return w, cost_vals
-
     def opt(self, optimizer=None, ansatz=None, stateprep=None, backend=None, epochs=100, tol=1e-4):
         """
         Parameters
@@ -85,29 +59,49 @@ class HoppingVQLS(VQLS):
             The cost function values during the optimization.
         """
 
+        # STANDARD VQLS
+        # -------------
         # initial weights
-        w = self.ansatz.init_weights()
+        w = ansatz.init_weights()
 
-        # configs
-        nhops = 3
-        step_size = 0.2
+        # solve linear system
+        w, cost_vals, iters = optimizer.optimize(func=self.cost, w=w, epochs=epochs, tol=tol)
+
+        # global minimum reached in first try
+        if np.linalg.norm(cost_vals[-1]) < tol:
+            return w, cost_vals
+
+        # BASIN HOPPING
+        # -------------
+        # Initialize variables
+        nhops = 5
+        step_size = np.pi * 0.7
+        cost_vals = [self.cost(w)]  # Initial cost value
+        best_x = np.copy(w)
+        best_f = cost_vals[-1]
+        x_current = np.copy(w)
+        f_current = cost_vals[-1]
+        temp = 1.0
 
         for i in range(nhops):
+            if np.linalg.norm(f_current) > tol:
+                w = x_current + np.random.uniform(-step_size, step_size, size=w.shape)
+            else:
+                return w, cost_vals
 
-            if np.linalg.norm(cost_vals[-1]) > self.tol:
-                w = w + np.random.uniform(-step_size, step_size, size=w.shape)
-
-            # local optimization
-            w, cost_vals, iters = self.optimizer.optimize(func=self.cost, w=w, epochs=self.epochs, tol=self.tol)
+            # Local optimization
+            w, cost_vals, iters = optimizer.optimize(func=self.cost, w=w, epochs=epochs, tol=tol)
 
             # Metropolis acceptance criterion
-            if cost_vals[-1] < f_current
+            # if cost_vals[-1] < f_current or np.exp((f_current - cost_vals[-1]) / temp) > np.random.rand():
+            if cost_vals[-1] < f_current or np.exp((f_current - cost_vals[-1]) / temp) > np.random.rand():
+
                 x_current = w
                 f_current = cost_vals[-1]
 
             # Update the best solution found
-            if cost_vals[-1] < best_f:
-                best_x = w
-                best_f = cost_vals[-1]
+            if f_current < best_f:
+                best_x = x_current
+                best_f = f_current
 
-        return w, cost_vals
+        return best_x, cost_vals
