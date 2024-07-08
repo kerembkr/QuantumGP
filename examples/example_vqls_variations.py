@@ -13,11 +13,11 @@ from src.optimizers.optim_torch import SGDTorch
 np.random.seed(42)
 
 # number of qubits & layers
-nqubits = 3
-nlayers = 3
+nqubits = 1
+nlayers = 1
 
 # maximum number of iterations
-maxiter = 200
+maxiter = 100
 
 # random symmetric positive definite matrix
 A0, b0 = get_random_ls(nqubits, easy_example=True)
@@ -37,9 +37,12 @@ ansatz_ = HardwareEfficient(nqubits=nqubits, nlayers=nlayers)
 prep_ = MottonenStatePrep(wires=range(nqubits))
 
 # setup VQLS solvers
-solver1.setup(optimizer=AdamQML(), ansatz=ansatz_, stateprep=prep_, backend=DefaultQubit(wires=nqubits + 1), epochs=maxiter, tol=1e-5)
-solver2.setup(optimizer=AdamQML(), ansatz=ansatz_, stateprep=prep_, backend=DefaultQubit(wires=nqubits + 1), epochs=maxiter, epochs_bo=None, tol=1e-5)
-solver3.setup(optimizer=SGDTorch(), ansatz=ansatz_, stateprep=prep_, backend=DefaultQubitTorch(wires=nqubits + 1), epochs=maxiter, tol=1e-5)
+solver1.setup(optimizer=AdamQML(), ansatz=ansatz_, stateprep=prep_, backend=DefaultQubit(wires=nqubits + 1),
+              epochs=maxiter, tol=1e-5)
+solver2.setup(optimizer=AdamQML(), ansatz=ansatz_, stateprep=prep_, backend=DefaultQubit(wires=nqubits + 1),
+              epochs=maxiter, epochs_bo=None, tol=1e-5)
+solver3.setup(optimizer=SGDTorch(), ansatz=ansatz_, stateprep=prep_, backend=DefaultQubitTorch(wires=nqubits + 1),
+              epochs=maxiter, tol=1e-5)
 
 # solve linear systems
 xopt1 = solver1.solve()
@@ -50,9 +53,10 @@ xopt3 = solver3.solve()
 
 # solution of linear system
 print("")
-print("xopt1", xopt1)
-print("xopt2", xopt2)
-print("xopt3", xopt3)
+print("xsol =", np.linalg.solve(A0, b0))
+print("vqls =", np.round(xopt1, 2))
+print("fast =", np.round(xopt2, 2))
+print("deep =", np.round(xopt3, 2))
 
 # plot loss functions
 losses = {"VQLS": solver1.loss, "FastSlowVQLS": solver2.loss, "DeepVQLS": solver3.loss}

@@ -46,6 +46,10 @@ class VQLS(Solver):
 
         self.x = prepare_and_sample(self.wopt)
 
+        self.x = self.correct_scaling_err(self.x)  # correct the scaling error
+
+        self.x = np.real(self.x)  # only regard the real part
+
         return self.x
 
     def setup(self, optimizer=None, ansatz=None, stateprep=None, backend=None, epochs=100, tol=1e-4):
@@ -76,6 +80,8 @@ class VQLS(Solver):
     def set_lse(self, A, b):
         self.A = A
         self.b = b
+
+        self.bnorm = np.linalg.norm(self.b)
 
         # number of qubits
         self.nqubits = int(np.log(len(b)) / np.log(2))
@@ -342,3 +348,19 @@ class VQLS(Solver):
                 axs[i, 1].set_xticklabels([])
 
         utils.save_fig(["vqls/", "probs"])
+
+    def correct_scaling_err(self, x):
+
+        try:
+            x = x.detach().numpy()
+        except:
+            pass
+
+        # Step 4: Calculate the optimal scaling factor mu
+        Ax_normed = self.A @ x
+        mu = self.bnorm / np.linalg.norm(Ax_normed)
+
+        # Step 5: Scale x_normed to get the original solution x
+        x = mu * x
+
+        return x
