@@ -9,37 +9,6 @@ class OptimizerTorch(ABC):
     def __init__(self):
         self.name = None
 
-    # def optimize(self, func, model, w, epochs, tol):
-    #
-    #     # features
-    #     x = torch.ones(model.ninputs) * (np.pi / 4)
-    #
-    #     # Optimizer
-    #     opt = self.get_optimizer(model)
-    #
-    #     # Optimization loop
-    #     cost_vals = []
-    #     for it in range(epochs):
-    #         ta = time()
-    #
-    #         # neural network maths
-    #         opt.zero_grad()  # init gradient
-    #         out, _ = model(x)  # forward pass
-    #         loss = func(out)  # compute loss
-    #         loss.backward()  # backpropagation
-    #         opt.step()  # update weights
-    #
-    #         print("{:s}     Step {:3d}    obj = {:9.7f}    time = {:9.7f} sec".format(self.name, it, loss.item(),
-    #                                                                                   time() - ta))
-    #         cost_vals.append(loss.item())  # save cost function value
-    #         if np.abs(loss.item()) < tol:  # breaking condition
-    #             _, w = model(x)
-    #             return w, cost_vals, it+1
-    #
-    #     _, w = model(x)
-    #
-    #     return w, cost_vals, epochs
-
     def optimize(self, func, model, w, epochs, tol):
         # Features
         x = torch.ones(model.ninputs) * (np.pi / 4)
@@ -49,7 +18,8 @@ class OptimizerTorch(ABC):
 
         # Optimization loop
         cost_vals = []
-        with tqdm(total=epochs, desc=self.name) as pbar:
+        padded_name = self.name.ljust(15)
+        with tqdm(total=epochs, desc=padded_name) as pbar:
             for it in range(epochs):
                 ta = time()
 
@@ -63,9 +33,6 @@ class OptimizerTorch(ABC):
                 elapsed_time = time() - ta
                 pbar.set_postfix(obj="{:9.7f}".format(loss.item()), time="{:9.7f} sec".format(elapsed_time))
                 pbar.update(1)
-                #
-                # print("{:s}     Step {:3d}    obj = {:9.7f}    time = {:9.7f} sec".format(self.name, it, loss.item(),
-                #                                                                           elapsed_time))
                 cost_vals.append(loss.item())  # save cost function value
 
                 if np.abs(loss.item()) < tol:  # breaking condition

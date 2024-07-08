@@ -9,30 +9,14 @@ class OptimizerQML(ABC):
     def __init__(self):
         self.name = None
 
-    # def optimize(self, func, w, epochs, tol):
-    #
-    #     # Get the optimizer from the child class
-    #     opt = self.get_optimizer()
-    #
-    #     # Optimization loop
-    #     cost_vals = []
-    #     for it in range(epochs):
-    #         ta = time()
-    #         w, cost_val = opt.step_and_cost(func, w)
-    #         print("{:s}     Step {:3d}    obj = {:9.7f}    time = {:9.7f} sec".format(self.name, it, cost_val, time() - ta))
-    #         cost_vals.append(cost_val)
-    #         if np.abs(cost_val) < tol:
-    #             return w, cost_vals, it+1
-    #
-    #     return w, cost_vals, epochs
-
     def optimize(self, func, w, epochs, tol):
         # Get the optimizer from the child class
         opt = self.get_optimizer()
 
         # Optimization loop
         cost_vals = []
-        with tqdm(total=epochs, desc=self.name) as pbar:
+        padded_name = self.name.ljust(15)
+        with tqdm(total=epochs, desc=padded_name) as pbar:
             for it in range(epochs):
                 ta = time()
                 w, cost_val = opt.step_and_cost(func, w)
