@@ -4,8 +4,10 @@ using Gaussian Inference. This includes the inversion of the covariance matrix. 
 classical and quantum algorithms.
 
 Quantum Solvers
-- Harrow-Hassidim-Lloyd (HHL) 
 - Variational Quantum Linear Solver (VQLS)
+- Fast & Slow VQLS (using global and local optimization techniques in a hybrid fashion)
+- Basin Hopping VQLS (using random perturbations to escape local minima)
+- Deep VQLS (using deep neural networks to initialize the weights)
 
 Classical Solvers
 - Cholesky
