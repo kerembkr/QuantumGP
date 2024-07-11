@@ -3,17 +3,14 @@ from time import time
 from src.kernels.rbf import RBFKernel
 from src.gpr.gaussian_process import GP
 from src.utils.utils import data_from_func
-from src.solver.classic.pcg import PCG
-from src.solver.classic.cg import CG
+from src.solver.quantum.vqls.vqls import VQLS
 from input.testfuncs_1d import oscillatory_increasing_amplitude
 
 # fix random seed
 np.random.seed(42)
 
-n_train = 30  # training points
+n_train = 8  # training points
 n_test = 500  # testing points
-pre_iters = 10  # preconditioning steps
-rank = 20  # solver iterations
 
 # choose function
 func = oscillatory_increasing_amplitude
@@ -26,8 +23,7 @@ kernel = RBFKernel(theta=[1.0, 1.0])
 eps = 0.1
 
 # choose solver
-solver = PCG(rank=rank, pre_iters=pre_iters)
-# solver = CG(rank=rank)
+solver = VQLS()
 
 # choose preconditioner
 precon = None
