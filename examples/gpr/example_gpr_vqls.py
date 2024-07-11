@@ -10,7 +10,7 @@ from input.testfuncs_1d import oscillatory_increasing_amplitude
 np.random.seed(42)
 
 n_train = 8  # training points
-n_test = 500  # testing points
+n_test = 8  # testing points
 
 # choose function
 func = oscillatory_increasing_amplitude
