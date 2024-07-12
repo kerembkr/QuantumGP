@@ -205,6 +205,7 @@ class GP:
         (s, ld) = np.linalg.slogdet(G)  # compute log determinant of symmetric pos.def. matrix
 
         ###
+        invK = None
         if self.solver is not None:
             self.solver.set_lse(G, self.y_train)
             a = self.solver.solve()
@@ -218,9 +219,24 @@ class GP:
         # gradient
         if eval_gradient:
             dloglik = np.zeros(len(hypers))
+            # for i in range(len(hypers)):
+            #     if self.solver is not None:
+            #         dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(invK @ dK[i])
+            #     else:
+            #         dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(np.linalg.solve(G, dK[i]))
+            # return loglik, dloglik
+
             for i in range(len(hypers)):
                 if self.solver is not None:
-                    dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(invK @ dK[i])
+                    if self.invK is not None:
+                        dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(self.invK @ dK[i])
+                    else:
+                        nsolves = np.shape(dK[i])[0]
+                        invK_dK = np.zeros((len(self.y_train), len(self.y_train)))
+                        for j in range(nsolves):
+                            self.solver.set_lse(A=K, b=dK[i][:, j])
+                            invK_dK[:, j] = self.solver.solve()
+                        dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(invK_dK)
                 else:
                     dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(np.linalg.solve(G, dK[i]))
             return loglik, dloglik
