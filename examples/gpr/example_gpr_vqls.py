@@ -15,7 +15,7 @@ from src.utils.embedding import MottonenStatePrep
 np.random.seed(42)
 
 n_train = 8  # training points
-n_test = 8  # testing points
+n_test = 64  # testing points
 
 # choose function
 func = oscillatory_increasing_amplitude
@@ -28,14 +28,14 @@ kernel = RBFKernel(theta=[1.0, 1.0])
 eps = 0.1
 
 # quantum solver
-# solver = VQLS()
-# maxiter = 2
-# nqubits = 3
-# nlayers = 1
-# ansatz_ = HardwareEfficient(nqubits=nqubits, nlayers=nlayers)
-# prep_ = MottonenStatePrep(wires=range(nqubits))
-# solver.setup(optimizer=AdamQML(), ansatz=ansatz_, stateprep=prep_, backend=DefaultQubit(wires=nqubits + 1),
-#              epochs=maxiter)
+solver = VQLS()
+maxiter = 20
+nqubits = 3
+nlayers = 1
+ansatz_ = HardwareEfficient(nqubits=nqubits, nlayers=nlayers)
+prep_ = MottonenStatePrep(wires=range(nqubits))
+solver.setup(optimizer=AdamQML(), ansatz=ansatz_, stateprep=prep_, backend=DefaultQubit(wires=nqubits + 1),
+             epochs=maxiter)
 
 # classic solver
 solver = CG()
@@ -60,4 +60,4 @@ y_mean, y_cov = model.predict(X_test)
 print("predict : {:.4f} sec".format(time()-t0))
 
 # plot posterior
-model.plot_gp(X=X_test, mu=y_mean, cov=y_cov, post=True)
+model.plot_gp(X=X_test, mu=y_mean, cov=y_cov, post=True, title="n8_n64_cg")

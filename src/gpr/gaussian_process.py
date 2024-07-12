@@ -54,8 +54,8 @@ class GP:
         self.n = len(y)
 
         # Choose hyperparameters based on maximizing the log-marginal likelihood
-        if self.optimizer is not None:
-            self.hyperopt()
+        # if self.optimizer is not None:
+        #     self.hyperopt()
 
         # K_ = K + sigma^2 I
         K_ = self.kernel(self.X_train)
@@ -209,7 +209,8 @@ class GP:
         if self.solver is not None:
             self.solver.set_lse(G, self.y_train)
             a = self.solver.solve()
-            invK = self.solver.invM
+            if hasattr(self.solver, 'invM'):
+                invK = self.solver.invM
         else:
             a = np.linalg.solve(G, self.y_train)  # G \\ Y
 
@@ -219,17 +220,10 @@ class GP:
         # gradient
         if eval_gradient:
             dloglik = np.zeros(len(hypers))
-            # for i in range(len(hypers)):
-            #     if self.solver is not None:
-            #         dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(invK @ dK[i])
-            #     else:
-            #         dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(np.linalg.solve(G, dK[i]))
-            # return loglik, dloglik
-
             for i in range(len(hypers)):
                 if self.solver is not None:
-                    if self.invK is not None:
-                        dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(self.invK @ dK[i])
+                    if invK is not None:
+                        dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(invK @ dK[i])
                     else:
                         nsolves = np.shape(dK[i])[0]
                         invK_dK = np.zeros((len(self.y_train), len(self.y_train)))
@@ -311,7 +305,7 @@ class GP:
         if save_png:
             save_fig(["gpr", "samples"])
 
-    def plot_gp(self, X, mu, cov, post=False, plot_acq=False):
+    def plot_gp(self, X, mu, cov, post=False, plot_acq=False, title=None):
 
         # Create a figure
         if plot_acq:
@@ -359,7 +353,4 @@ class GP:
 
         plt.tight_layout()
 
-        if post:
-            save_fig(["gpr", "gp" + "_" + str(len(self.X_train))])
-        else:
-            save_fig(["gpr", "gp_0"])
+        save_fig(["gpr", title])
