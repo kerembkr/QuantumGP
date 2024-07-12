@@ -62,10 +62,13 @@ class GP:
 
         K_[np.diag_indices_from(K_)] += self.alpha_
 
+        ###
         if self.solver is not None:  # custom solver
             self.solver.set_lse(A=K_, b=self.y_train)
-            print("cond(A) =", self.solver.condA)
+            # print("cond(A) =", self.solver.condA)
             self.alpha = self.solver.solve()
+            if hasattr(self.solver, 'invM'):
+                self.invK = self.solver.invM
         else:  # standard Cholesky
             self.L = cholesky(K_, lower=True, check_finite=False)  # K_ = L*L^T --> L
             self.alpha = cho_solve((self.L, True), self.y_train, check_finite=False)  # alpha = L^T \ (L \ y)
@@ -157,9 +160,22 @@ class GP:
             # MEAN
             y_mean_ = K_trans @ self.alpha
 
+            K = self.kernel(self.X_train)
+            K[np.diag_indices_from(K)] += self.alpha_
+
+            ###
             # inference
             if self.solver is not None:  # custom solver
-                y_cov_ = self.kernel(X) - K_trans @ (self.solver.invM @ K_trans.T)  # std dev
+                if self.invK is not None:
+                    y_cov_ = self.kernel(X) - K_trans @ (self.invK @ K_trans.T)  # std dev
+                else:
+                    nsolves = np.shape(K_trans.T)[1]
+                    invK_KTrans = np.zeros((len(self.y_train), len(X)))
+                    for i in range(nsolves):
+                        self.solver.set_lse(A=K, b=K_trans.T[:, i])
+                        invK_KTrans[:, i] = self.solver.solve()
+                    y_cov_ = self.kernel(X) - K_trans @ invK_KTrans  # std dev
+
             else:  # basic Cholesky
                 V = solve_triangular(self.L, K_trans.T, lower=True, check_finite=False)  # std dev
                 y_cov_ = self.kernel(X) - V.T @ V
@@ -188,9 +204,11 @@ class GP:
 
         (s, ld) = np.linalg.slogdet(G)  # compute log determinant of symmetric pos.def. matrix
 
+        ###
         if self.solver is not None:
             self.solver.set_lse(G, self.y_train)
             a = self.solver.solve()
+            invK = self.solver.invM
         else:
             a = np.linalg.solve(G, self.y_train)  # G \\ Y
 
@@ -202,7 +220,7 @@ class GP:
             dloglik = np.zeros(len(hypers))
             for i in range(len(hypers)):
                 if self.solver is not None:
-                    dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(self.solver.invM @ dK[i])
+                    dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(invK @ dK[i])
                 else:
                     dloglik[i] = -np.inner(a, dK[i] @ a) + np.trace(np.linalg.solve(G, dK[i]))
             return loglik, dloglik
@@ -271,11 +289,10 @@ class GP:
         # plt.plot(X_train_sorted, prior_samples + self.alpha_ * randn(n, nsamples), ".-")
         delta = (max(self.y_train) - min(self.y_train)) / 5.0
         ax.set_ylim([min(self.y_train) - delta, max(self.y_train) + delta])
-
         plt.legend()
+
         # save sample plots
         if save_png:
-            # save_fig("samples")
             save_fig(["gpr", "samples"])
 
     def plot_gp(self, X, mu, cov, post=False, plot_acq=False):
@@ -327,9 +344,6 @@ class GP:
         plt.tight_layout()
 
         if post:
-            # save_fig("gp" + "_" + str(len(self.X_train)))
             save_fig(["gpr", "gp" + "_" + str(len(self.X_train))])
         else:
-            # save_fig("gp_0")
             save_fig(["gpr", "gp_0"])
-
