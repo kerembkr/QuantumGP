@@ -29,7 +29,7 @@ eps = 0.1
 
 # quantum solver
 solver = VQLS()
-maxiter = 20
+maxiter = 50
 nqubits = 3
 nlayers = 1
 ansatz_ = HardwareEfficient(nqubits=nqubits, nlayers=nlayers)
@@ -38,7 +38,7 @@ solver.setup(optimizer=AdamQML(), ansatz=ansatz_, stateprep=prep_, backend=Defau
              epochs=maxiter)
 
 # classic solver
-solver = CG()
+# solver = CG()
 
 # create GP model
 model = GP(kernel=kernel,
@@ -60,4 +60,4 @@ y_mean, y_cov = model.predict(X_test)
 print("predict : {:.4f} sec".format(time()-t0))
 
 # plot posterior
-model.plot_gp(X=X_test, mu=y_mean, cov=y_cov, post=True, title="n8_n64_cg")
+model.plot_gp(X=X_test, mu=y_mean, cov=y_cov, post=True, title="n8_-n64_vqls")
